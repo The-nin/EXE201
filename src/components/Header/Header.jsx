@@ -1,8 +1,8 @@
 import React from "react";
-import Navbar, { Image } from "react-bootstrap";
+import { Navbar, Image } from "react-bootstrap";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
-import Link from "react-router-dom";
+import { Link } from "react-router-dom";
 
 function Header() {
   return (
