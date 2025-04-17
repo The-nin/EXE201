@@ -1,35 +1,54 @@
 import React from "react";
-import { Navbar, Image } from "react-bootstrap";
+import { Image } from "react-bootstrap";
 import Container from "react-bootstrap/Container";
-import Nav from "react-bootstrap/Nav";
 import { Link } from "react-router-dom";
+import Button from "react-bootstrap/Button";
+import { FiUser } from "react-icons/fi";
+import { BsCart2 } from "react-icons/bs";
+import header from "./Header.module.scss";
 
 function Header() {
   return (
-    <Navbar expand="lg" className="bg-body-tertiary">
-      <Container>
-        <Navbar.Brand>
-          <Link to="/home" className="navbar-brand">
-            <Image src="https://res.cloudinary.com/dntcdrfiq/image/upload/v1744641869/logo_web-03_4_e8lvkf.svg" />
-            ICOT
+    <>
+      <Container className={header["container"]}>
+        <div className={header["logo-title"]}>
+          <Link to="/" className={header["logo-name"]}>
+            <Image
+              src="https://res.cloudinary.com/dntcdrfiq/image/upload/v1744641869/logo_web-03_4_e8lvkf.svg"
+              alt="logo"
+              className={header["logo-img"]}
+            />
+            <p className={header["title"]}>ICOT</p>
           </Link>
-        </Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="me-auto">
-            <Link to="/about-us" className="nav-link">
-              About Us
+        </div>
+
+        <div className={header["nav-btn"]}>
+          <div className={header["nav"]}>
+            <Link to="/about-us" className={header["nav-title"]}>
+              About us
             </Link>
-            <Link to="/products" className="nav-link">
+
+            <Link to="/products" className={header["nav-title"]}>
               Products
             </Link>
-            <Link to="/custom" className="nav-link">
+
+            <Link to="/custom" className={header["nav-title"]}>
               Custom
             </Link>
-          </Nav>
-        </Navbar.Collapse>
+          </div>
+
+          <div className={header["button-container"]}>
+            <Button className={header["btn"]}>
+              <FiUser size={28} />
+            </Button>
+
+            <Button className={header["btn"]}>
+              <BsCart2 size={28} />
+            </Button>
+          </div>
+        </div>
       </Container>
-    </Navbar>
+    </>
   );
 }
 
