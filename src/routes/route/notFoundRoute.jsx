@@ -1,11 +1,10 @@
-// import { lazy } from "react";
-// const NotFound = lazy(() => import("../../pages/notFoundPage"));
+import { lazy } from "react";
 import ROUTES from "../index";
-import NotFound from "../../pages/notFoundPage";
+const NotFound = lazy(() => import("../../pages/notFoundPage"));
 
 const notFoundRoute = {
-    path: ROUTES.NOT_FOUND_PAGE,
-    element : <NotFound />, 
+  path: ROUTES.NOT_FOUND_PAGE,
+  element: <NotFound />,
 };
 
-export default notFoundRoute
+export default notFoundRoute;

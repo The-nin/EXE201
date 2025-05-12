@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import Button from "react-bootstrap/Button";
 import { FiUser } from "react-icons/fi";
 import { BsCart2 } from "react-icons/bs";
-import header from "./Header.module.scss";
+import header from "./styles/Header.module.scss";
 
 function Header() {
   return (

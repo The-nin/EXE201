@@ -1,3 +1,52 @@
 .container{
-    
+    display: flex;
+    justify-content: space-around;
+    background-color: #fff;
+    font-family: 'Roboto', sans-serif;
+
+    .left-section{
+        
+        .title{
+            color: #BE6968;
+            font-size: 20px;
+        }
+
+        .email{
+            display:flex;
+            align-items: center;
+            gap: 10px;
+
+            .email-icon{
+                color: #FDB293;
+            }
+        }
+
+        .phone{
+            display:flex;
+            align-items: center;
+            gap: 10px;
+
+            .phone-icon{
+                color: #FDB293;
+            }
+        }
+    }
+
+    .right-section{
+
+        .title{
+            color: #BE6968;
+            font-size: 20px;
+        }
+
+        .address{
+            display:flex;
+            align-items: center;
+            gap: 10px;
+
+            .address-icon{
+                color: #FDB293;
+            }
+        }
+    }
 }
