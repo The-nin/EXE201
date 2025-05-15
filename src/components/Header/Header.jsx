@@ -1,4 +1,3 @@
-import React from "react";
 import { Image } from "react-bootstrap";
 import Container from "react-bootstrap/Container";
 import { Link } from "react-router-dom";
@@ -10,7 +9,7 @@ import header from "./styles/Header.module.scss";
 function Header() {
   return (
     <>
-      <Container className={header["container"]}>
+      <Container fluid className={header["container"]}>
         <div className={header["logo-title"]}>
           <Link to="/" className={header["logo-name"]}>
             <Image
