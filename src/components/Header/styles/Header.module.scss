@@ -1,77 +1,146 @@
-.container{
-    background: linear-gradient(to bottom, #F38280 32%, #FFBE98 100%);
+.container {
+  background: linear-gradient(to bottom, #F38280 32%, #FFBE98 100%);
+  display: flex;
+  align-items: center;
+  font-family: 'Roboto', sans-serif;
+  justify-content: space-between;
+  padding: 20px 40px;
+  flex-wrap: wrap;
+}
+
+.logo-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  .logo-name {
     display: flex;
     align-items: center;
-    font-family: 'Roboto', sans-serif;
-    justify-content: space-between;
-    
-    .logo-title{
-        padding: 30px;
-        display: flex;
-        align-items: center;
-        align-items: center;
+    text-decoration: none;
+    gap: 12px;
 
-        .logo-name{
-            text-decoration: none;
-
-            .logo-img{
-                width: auto;
-                height: 60px;
-            }
-    
-            .title{
-                display: flex;
-                justify-content: center;
-                color: #fff;
-                size: 36px;
-                font-weight: 700;
-                width: 100%;
-                margin: 0;
-            }
-        }
+    .logo-img {
+      height: 55px;
+      width: auto;
     }
 
-    .nav-btn{
-        display: flex;
-        justify-content: space-around;
-        flex-direction: row;
+    .title {
+      color: #fff;
+      font-size: 32px;
+      font-weight: 800;
+      margin: 0;
+    }
+  }
+}
+
+.nav-btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 40px;
+
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: 50px;
+
+    .nav-title {
+      font-weight: 600;
+      color: #fff;
+      text-decoration: none;
+      font-size: 22px;
+      position: relative;
+      transition: all 0.3s ease;
+
+      &:hover {
+        text-decoration: none;
+        color: #ffe;
+      }
+
+      &::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: -4px;
+        height: 2px;
+        width: 0%;
+        background-color: white;
+        transition: width 0.3s ease;
+      }
+
+      &:hover::after {
         width: 100%;
-        
-        .nav{
-            display: flex;
-            justify-content: space-around;
-            flex-direction: row;
-            align-items: center;
-            gap: 100px;
-
-            .nav-title{
-                font-weight: 700;
-                color: #fff;
-                text-decoration: none;
-                font-size: 26px;
-
-                &:hover{
-                    text-decoration: underline;
-                    text-underline-offset: 4px;
-                    text-decoration-thickness: 2px;
-                }
-            }
-        }
-
-        .button-container{
-            display: flex;
-            justify-content: space-around;
-            gap: 10px;
-
-            .btn{
-                background-color: #fff;
-                border-radius: 30px;
-                width: 92px;
-                color: #F69170;
-                padding: 10px;
-                border: none;
-                height: 52px;
-            }
-        }
+      }
     }
+  }
+
+  .button-container {
+    display: flex;
+    gap: 14px;
+
+    .btn {
+      background-color: #fff;
+      border-radius: 50px;
+      width: 50px;
+      height: 50px;
+      padding: 0;
+      border: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #F69170;
+      transition: all 0.3s ease;
+
+      &:hover {
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        transform: scale(1.05);
+      }
+    }
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 20px;
+  }
+
+  .nav-btn {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .nav {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .button-container {
+    align-self: flex-end;
+  }
+}
+.nav-title {
+  font-weight: 700;
+  color: #fff;
+  text-decoration: none;
+  font-size: 26px;
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-thickness: 2px;
+  }
+}
+
+.active {
+  color: #d13b3b !important; // màu vàng nổi bật
+  text-decoration: underline;
+  font-weight: 800;
 }

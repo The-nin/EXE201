@@ -5,7 +5,7 @@ const login = async (username, password) => {
         const response = await instance.post("/api/auth/login",{
             username,
             password
-        })
+        }, { withCredentials: true })
         return response
     } catch (error) {
         console.log("error", error);

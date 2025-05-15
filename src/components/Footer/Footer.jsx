@@ -2,33 +2,51 @@ import React from "react";
 import { CgMail } from "react-icons/cg";
 import { FiPhone } from "react-icons/fi";
 import { SlLocationPin } from "react-icons/sl";
+import { FaFacebookF, FaInstagram, FaTwitter, FaTiktok } from "react-icons/fa";
 import Container from "react-bootstrap/Container";
 import footer from "./Footer.module.scss";
 
 function Footer() {
   return (
-    <Container fluid className={footer["container"]}>
-      <div className={footer["left-section"]}>
-        <h3 className={footer["title"]}>CONTACT US</h3>
-        <div className={footer["email"]}>
-          <CgMail className={footer["email-icon"]} />
-          abcyxz@gmail.com
+    <footer className={footer["footer"]}>
+      <Container className={footer["content"]}>
+        <div className={footer["section"]}>
+          <h5 className={footer["title"]}>📬 Liên hệ</h5>
+          <div className={footer["info"]}>
+            <CgMail className={footer["icon"]} />
+            <span>phanhoangnam17@gmail.com</span>
+          </div>
+          <div className={footer["info"]}>
+            <FiPhone className={footer["icon"]} />
+            <span>+84 914566567</span>
+          </div>
         </div>
 
-        <div className={footer["phone"]}>
-          <FiPhone className={footer["phone-icon"]} />
-          84
+        <div className={footer["section"]}>
+          <h5 className={footer["title"]}>🏭 Đối tác in ấn</h5>
+          <div className={footer["info"]}>
+            <SlLocationPin className={footer["icon"]} />
+            <span>ĐH FPT, Quận 9, TP.HCM</span>
+          </div>
         </div>
-      </div>
 
-      <div className={footer["right-section"]}>
-        <h3 className={footer["title"]}>OUR PRINTING PARTNER</h3>
-        <div className={footer["address"]}>
-          <SlLocationPin className={footer["address-icon"]} />
-          street bla bla...
+        <div className={footer["section"]}>
+          <h5 className={footer["title"]}>📱 Mạng xã hội</h5>
+          <div className={footer["social-icons"]}>
+            <a href="https://facebook.com" target="_blank" rel="noreferrer">
+              <FaFacebookF />
+            </a>{" "}
+            <a href="https://instagram.com" target="_blank" rel="noreferrer">
+              <FaInstagram />
+            </a>
+          </div>
         </div>
+      </Container>
+
+      <div className={footer["bottom"]}>
+        © 2025 ICOT. Tất cả quyền được bảo lưu.
       </div>
-    </Container>
+    </footer>
   );
 }
 

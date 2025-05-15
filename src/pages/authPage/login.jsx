@@ -41,17 +41,18 @@ function LoginPage() {
 
     try {
       const response = await login(username, password);
-      if (response.code === 201) {
-        console.log("Login successful:", response.data);
+      console.log(response.data);
+      if (response.data.code === 200) {
+        localStorage.setItem("token", response.data.result.token);
         navigate("/");
+      } else {
+        setError(response.data.message);
       }
     } catch (err) {
       console.error("Login failed:", err);
-      setError(
-        err.response?.data?.message || "Đăng nhập thất bại. Vui lòng thử lại."
-      );
+      setError(err.response?.data?.message);
     } finally {
-      setIsApiLoading(false); // Stop loading
+      setIsApiLoading(false);
     }
   };
 
