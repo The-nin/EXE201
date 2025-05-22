@@ -29,11 +29,10 @@ export default function AboutUsPage() {
         </Col>
       </Row>
 
-      {/* Sứ mệnh */}
       <Row className="mb-5 align-items-center fade-in-up">
         <Col md={6}>
           <img
-            src="https://res.cloudinary.com/dntcdrfiq/image/upload/v1744640996/Apricat_2_gkxrcn.svg"
+            src="https://th.bing.com/th/id/OIF.5Q30erg4V9B60fXHhxz5Sg?w=313&h=180&c=7&r=0&o=5&dpr=1.4&pid=1.7"
             alt="Mission"
             className="img-fluid rounded shadow float-animation"
           />

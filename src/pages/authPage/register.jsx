@@ -7,9 +7,11 @@ import {
   Col,
   Card,
   Alert,
+  Spinner,
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { register } from "../../service/auth";
+import { AiOutlineHome } from "react-icons/ai"; // Icon Home từ react-icons
 
 function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -22,13 +24,12 @@ function RegisterPage() {
     gender: "",
     fullName: "",
     status: "ACTIVE",
-    role: "CUSTOMER", // Gửi cố định
+    role: "CUSTOMER",
   });
 
-  const [isImageLoading, setIsImageLoading] = useState(true);
-  const [isApiLoading, setIsApiLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
+  const [imageLoaded, setImageLoaded] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -44,86 +45,63 @@ function RegisterPage() {
     setError(null);
 
     if (formData.password !== formData.confirmPassword) {
-      setError("Mật khẩu xác nhận không khớp.");
-      return;
+      return setError("Mật khẩu xác nhận không khớp.");
     }
 
-    setIsApiLoading(true);
-
+    setLoading(true);
     const payload = { ...formData };
     delete payload.confirmPassword;
 
     try {
-      const response = await register(formData);
-      console.log(response);
+      const response = await register(payload);
       if (response.data.code === 201) {
         navigate("/login");
       } else {
-        navigate("/register");
+        setError("Đăng ký thất bại. Vui lòng thử lại.");
       }
     } catch (err) {
       setError(err.message || "Lỗi không xác định.");
     } finally {
-      setIsApiLoading(false);
+      setLoading(false);
     }
   };
 
   return (
     <Container
-      className="d-flex justify-content-center align-items-center"
-      style={{
-        height: "100vh",
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        overflow: "hidden",
-      }}
+      fluid
+      className="min-vh-100 d-flex justify-content-center align-items-center bg-light"
     >
-      <Card
-        className="shadow-sm w-100 rounded-4"
-        style={{ maxWidth: "1100px", height: "550px", borderRadius: "15px" }}
-      >
-        <Row className="g-0 h-100">
-          {/* Cột ảnh/logo */}
+      <Card className="w-100 shadow rounded-4" style={{ maxWidth: "1000px" }}>
+        <Row className="g-0">
+          {/* Image Panel */}
           <Col
-            md={6}
-            style={{
-              backgroundColor: "#f8f9fa",
-              borderTopLeftRadius: "15px",
-              borderBottomLeftRadius: "15px",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
+            md={5}
+            className="d-none d-md-flex bg-white justify-content-center align-items-center p-4"
           >
-            <img
-              src="https://res.cloudinary.com/dntcdrfiq/image/upload/v1744640996/Apricat_2_gkxrcn.svg"
-              alt="Register illustration"
-              style={{
-                width: "300px",
-                height: "300px",
-                objectFit: "contain",
-                display: isImageLoading ? "none" : "block",
-              }}
-              onLoad={() => setIsImageLoading(false)}
-              onError={() => setIsImageLoading(false)}
-            />
-            {isImageLoading && <div className="loader" />}
+            <div>
+              {!imageLoaded && (
+                <Spinner animation="border" variant="secondary" />
+              )}
+              <img
+                src="https://res.cloudinary.com/dntcdrfiq/image/upload/v1744640996/Apricat_2_gkxrcn.svg"
+                alt="Register"
+                onLoad={() => setImageLoaded(true)}
+                style={{
+                  maxWidth: "100%",
+                  height: "auto",
+                  display: imageLoaded ? "block" : "none",
+                }}
+              />
+            </div>
           </Col>
 
-          {/* Cột form */}
-          <Col md={6}>
-            <Card.Body className="p-5 d-flex flex-column justify-content-center h-100">
-              <h2 className="text-center mb-4" style={{ fontSize: "2rem" }}>
-                Đăng ký
-              </h2>
-              {error && (
-                <Alert variant="danger" className="mb-3">
-                  {error}
-                </Alert>
-              )}
+          {/* Form Panel */}
+          <Col md={7}>
+            <Card.Body className="p-4 p-md-5">
+              <h2 className="mb-4 text-center">Tạo tài khoản</h2>
+
+              {error && <Alert variant="danger">{error}</Alert>}
+
               <Form onSubmit={handleSubmit}>
                 <Row>
                   <Col md={6}>
@@ -132,31 +110,36 @@ function RegisterPage() {
                       <Form.Control
                         type="text"
                         name="username"
+                        placeholder="Nhập tài khoản"
                         value={formData.username}
                         onChange={handleChange}
                         required
                       />
                     </Form.Group>
+
                     <Form.Group className="mb-3">
                       <Form.Label>Mật khẩu</Form.Label>
                       <Form.Control
                         type="password"
                         name="password"
+                        placeholder="********"
                         value={formData.password}
                         onChange={handleChange}
                         required
                       />
                     </Form.Group>
+
                     <Form.Group className="mb-3">
-                      <Form.Label>Xác nhận mật khẩu</Form.Label>
+                      <Form.Label>Email</Form.Label>
                       <Form.Control
-                        type="password"
-                        name="confirmPassword"
-                        value={formData.confirmPassword}
+                        type="email"
+                        name="email"
+                        placeholder="example@email.com"
+                        value={formData.email}
                         onChange={handleChange}
-                        required
                       />
                     </Form.Group>
+
                     <Form.Group className="mb-3">
                       <Form.Label>Ngày sinh</Form.Label>
                       <Form.Control
@@ -172,21 +155,26 @@ function RegisterPage() {
                     <Form.Group className="mb-3">
                       <Form.Label>Số điện thoại</Form.Label>
                       <Form.Control
-                        type="text"
+                        type="tel"
                         name="phone"
+                        placeholder="098xxxxxxx"
                         value={formData.phone}
                         onChange={handleChange}
                       />
                     </Form.Group>
+
                     <Form.Group className="mb-3">
-                      <Form.Label>Email</Form.Label>
+                      <Form.Label>Xác nhận mật khẩu</Form.Label>
                       <Form.Control
-                        type="email"
-                        name="email"
-                        value={formData.email}
+                        type="password"
+                        name="confirmPassword"
+                        placeholder="Nhập lại mật khẩu"
+                        value={formData.confirmPassword}
                         onChange={handleChange}
+                        required
                       />
                     </Form.Group>
+
                     <Form.Group className="mb-3">
                       <Form.Label>Giới tính</Form.Label>
                       <Form.Select
@@ -200,11 +188,13 @@ function RegisterPage() {
                         <option value="OTHER">Khác</option>
                       </Form.Select>
                     </Form.Group>
+
                     <Form.Group className="mb-3">
-                      <Form.Label>Họ tên</Form.Label>
+                      <Form.Label>Họ và tên</Form.Label>
                       <Form.Control
                         type="text"
                         name="fullName"
+                        placeholder="Nguyễn Văn A"
                         value={formData.fullName}
                         onChange={handleChange}
                       />
@@ -214,14 +204,43 @@ function RegisterPage() {
 
                 <Button
                   type="submit"
-                  variant="primary"
                   className="w-100 mt-3"
-                  disabled={isApiLoading}
-                  style={{ padding: "10px", fontSize: "1.1rem" }}
+                  variant="primary"
+                  disabled={loading}
                 >
-                  {isApiLoading ? "Đang xử lý..." : "Đăng ký"}
+                  {loading ? "Đang xử lý..." : "Đăng ký"}
                 </Button>
               </Form>
+
+              {/* Thêm các nút quay lại trang đăng nhập và trang chủ */}
+              <div className="d-flex justify-content-center align-items-center mt-4">
+                <a
+                  href="/auth/login"
+                  className="back-to-home-link d-flex justify-content-center align-items-center"
+                  style={{
+                    fontSize: "16px",
+                    color: "#f38280",
+                    fontWeight: "600",
+                    textDecoration: "none",
+                  }}
+                >
+                  Quay lại đăng nhập
+                </a>
+                <span className="mx-3">|</span>
+                <a
+                  href="/"
+                  className="back-to-home-link d-flex justify-content-center align-items-center"
+                  style={{
+                    fontSize: "16px",
+                    color: "#f38280",
+                    fontWeight: "600",
+                    textDecoration: "none",
+                  }}
+                >
+                  <AiOutlineHome size={20} style={{ marginRight: "8px" }} />
+                  Quay lại trang chủ
+                </a>
+              </div>
             </Card.Body>
           </Col>
         </Row>

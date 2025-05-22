@@ -7,10 +7,12 @@ import {
   Col,
   Card,
   Alert,
+  Spinner,
 } from "react-bootstrap";
-import "bootstrap/dist/css/bootstrap.min.css";
 import { login } from "../../service/auth/index";
 import { useNavigate } from "react-router-dom";
+import { AiOutlineHome } from "react-icons/ai"; // Sử dụng icon Home từ react-icons
+import "../authPage/styles/login.module.scss"; // Custom CSS file
 
 function LoginPage() {
   const [username, setUsername] = useState("");
@@ -24,14 +26,8 @@ function LoginPage() {
     const img = new Image();
     img.src =
       "https://res.cloudinary.com/dntcdrfiq/image/upload/v1744640996/Apricat_2_gkxrcn.svg";
-    img.onload = () => {
-      console.log("Image loaded");
-      setIsImageLoading(false);
-    };
-    img.onerror = () => {
-      console.error("Failed to load image");
-      setIsImageLoading(false);
-    };
+    img.onload = () => setIsImageLoading(false);
+    img.onerror = () => setIsImageLoading(false);
   }, []);
 
   const handleSubmit = async (e) => {
@@ -41,16 +37,15 @@ function LoginPage() {
 
     try {
       const response = await login(username, password);
-      console.log(response.data);
       if (response.data.code === 200) {
         localStorage.setItem("token", response.data.result.token);
-        navigate("/");
+        localStorage.setItem("fullName", response.data.result.fullName);
+        navigate("/"); // Chuyển hướng đến trang chủ
       } else {
         setError(response.data.message);
       }
     } catch (err) {
-      console.error("Login failed:", err);
-      setError(err.response?.data?.message);
+      setError(err.response?.data?.message || "Lỗi không xác định");
     } finally {
       setIsApiLoading(false);
     }
@@ -58,60 +53,46 @@ function LoginPage() {
 
   return (
     <Container
-      className="d-flex justify-content-center align-items-center"
-      style={{
-        height: "100vh",
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        overflow: "hidden",
-      }}
+      fluid
+      className="min-vh-100 d-flex justify-content-center align-items-center bg-light"
     >
       <Card
-        className="shadow-sm w-100 rounded-4"
-        style={{ maxWidth: "1100px", borderRadius: "15px", height: "500px" }}
+        className="login-card shadow-lg rounded-4 w-100"
+        style={{
+          maxWidth: "calc(100% - 200px)", // Thu gọn form với khoảng cách 100px mỗi bên
+          width: "100%", // Đảm bảo form chiếm toàn bộ chiều rộng của Container
+        }}
       >
-        <Row className="g-0">
+        <Row className="p-4">
           <Col
             md={6}
-            style={{
-              height: "500px",
-              borderTopLeftRadius: "15px",
-              borderBottomLeftRadius: "15px",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
+            className="d-flex justify-content-center align-items-center bg-light rounded-start"
           >
             {isImageLoading ? (
-              <div className="loader" />
+              <Spinner animation="border" variant="primary" />
             ) : (
               <img
                 src="https://res.cloudinary.com/dntcdrfiq/image/upload/v1744640996/Apricat_2_gkxrcn.svg"
-                alt="Login illustration"
+                alt="Login Illustration"
                 className="float-animation"
                 style={{
                   width: "300px",
                   height: "300px",
                   objectFit: "contain",
                 }}
-                onLoad={() => setIsImageLoading(false)}
-                onError={() => setIsImageLoading(false)}
               />
             )}
           </Col>
           <Col md={6}>
-            <Card.Body className="p-5 d-flex flex-column justify-content-center h-100">
-              <h2 className="text-center mb-4" style={{ fontSize: "2rem" }}>
-                Đăng nhập
-              </h2>
+            <Card.Body className="p-5 d-flex flex-column justify-content-center">
+              <h2 className="text-center mb-4 fw-bold">Đăng nhập</h2>
+
               {error && (
-                <Alert variant="danger" className="mb-3">
+                <Alert variant="danger" className="mb-3 text-center">
                   {error}
                 </Alert>
               )}
+
               <Form onSubmit={handleSubmit}>
                 <Form.Group className="mb-3" controlId="formUsername">
                   <Form.Label>Tài khoản</Form.Label>
@@ -121,21 +102,18 @@ function LoginPage() {
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     required
-                    style={{ fontSize: "1.1rem" }}
                     disabled={isApiLoading}
                   />
                 </Form.Group>
 
-                <Form.Group className="mb-3" controlId="formPassword">
+                <Form.Group className="mb-4" controlId="formPassword">
                   <Form.Label>Mật khẩu</Form.Label>
                   <Form.Control
                     type="password"
                     placeholder="Nhập mật khẩu"
-                    autoComplete="on"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    style={{ fontSize: "1.1rem" }}
                     disabled={isApiLoading}
                   />
                 </Form.Group>
@@ -143,24 +121,37 @@ function LoginPage() {
                 <Button
                   variant="primary"
                   type="submit"
-                  className="w-100"
-                  style={{ fontSize: "1.1rem", padding: "10px" }}
+                  className="w-100 py-2"
                   disabled={isApiLoading}
                 >
                   {isApiLoading ? (
-                    <div
-                      className="loader"
-                      style={{ width: "20px", height: "20px" }}
-                    />
-                  ) : (
-                    "Đăng nhập"
-                  )}
+                    <Spinner animation="border" size="sm" className="me-2" />
+                  ) : null}
+                  {isApiLoading ? "Đang xử lý..." : "Đăng nhập"}
                 </Button>
-                <div className="text-center mt-3">
+
+                <div className="text-center mt-4">
                   <a href="/forgot-password">Quên mật khẩu</a> |{" "}
                   <a href="/auth/register">Đăng kí</a>
                 </div>
               </Form>
+
+              {/* Thay thế nút Back bằng một link đẹp hơn */}
+              <div className="d-flex justify-content-center align-items-center mt-5">
+                <a
+                  href="/"
+                  className="back-to-home-link d-flex justify-content-center align-items-center"
+                  style={{
+                    fontSize: "16px",
+                    color: "#f38280",
+                    fontWeight: "600",
+                    textDecoration: "none",
+                  }}
+                >
+                  <AiOutlineHome size={20} style={{ marginRight: "8px" }} />
+                  Quay lại trang chủ
+                </a>
+              </div>
             </Card.Body>
           </Col>
         </Row>
