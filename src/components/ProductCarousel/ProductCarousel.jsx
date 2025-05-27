@@ -1,5 +1,5 @@
 import Carousel from "react-bootstrap/Carousel";
-import "./ProductCarousel.scss"; // tạo thêm file CSS nếu muốn tùy chỉnh
+import "./ProductCarousel.scss"; 
 
 function ProductCarousel() {
   return (

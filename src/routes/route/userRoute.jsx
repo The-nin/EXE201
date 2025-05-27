@@ -1,5 +1,7 @@
 import { lazy } from "react";
 import ROUTES from "../index";
+import CustomShirtOrder from "../../pages/customOrderPage/CustomShirtOrder";
+import ProductDetail from "../../components/ProductCard/ProductDetail";
 const LandingPage = lazy(() => import("../../pages/landingPage/index"));
 const AboutUsPage = lazy(() => import("../../pages/aboutUsPage/aboutUs"));
 const ProductPage = lazy(() => import("../../pages/productPage/product"));
@@ -18,8 +20,16 @@ const userRoutes = [
     element: <ProductPage />,
   },
   {
+    path: ROUTES.PRODUCT_DETAIL_PAGE,
+    element: <ProductDetail />,
+  },
+  {
     path: ROUTES.CONTACT_PAGE,
     element: <ContactPage />,
+  },
+  {
+    path: ROUTES.CUSTOM_SHIRT_PAGE,
+    element: <CustomShirtOrder />,
   },
 ];
 

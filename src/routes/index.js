@@ -8,8 +8,11 @@ const ROUTES = {
     PRODUCT_DETAIL_PAGE: "product/:id",
     ORDER_DETAIL_PAGE: "order/:id",
     CONTACT_PAGE: "contact",
+    CUSTOM_SHIRT_PAGE: "custom-shirt",
     ADMIN: {
-        DASHBOARD: "/admin/dashboard",
+        LOGIN: "login",
+        DASHBOARD: "dashboard",
+        ACCOUNT_MNG: "account-management"
     },
     AUTH: {
         LOGIN: "login",
