@@ -1,0 +1,149 @@
+$primary-color: #f38280;
+$secondary-color: #ffbe98;
+$text-color: #fff;
+$hover-color: #ffe;
+$active-color: #c24040;
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px; /* Giảm padding để header nhỏ gọn hơn */
+  background: linear-gradient(to bottom, $primary-color 32%, $secondary-color 100%);
+  font-family: 'Roboto', sans-serif;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.logo-title {
+  display: flex;
+  align-items: center;
+}
+
+.logo-name {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.logo-img {
+  height: 40px; /* Giảm chiều cao logo để header nhẹ nhàng hơn */
+  width: auto;
+}
+
+.title {
+  color: $text-color;
+  font-size: 24px; /* Giảm kích thước font cho tiêu đề */
+  font-weight: 800;
+  margin-left: 8px;
+  margin-top: 15px;
+}
+
+.nav-btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 30px;
+}
+
+.nav {
+  display: flex;
+  gap: 40px;
+}
+
+.nav-title {
+  font-size: 18px; /* Giảm kích thước font của các mục menu */
+  font-weight: 600;
+  color: $text-color;
+  text-decoration: none;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.nav-title:hover {
+  color: $hover-color;
+}
+
+.nav-title::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  height: 2px;
+  width: 0%;
+  background-color: white;
+  transition: width 0.3s ease;
+}
+
+.nav-title:hover::after {
+  width: 100%;
+}
+
+.active {
+  color: $active-color !important;
+  text-decoration: underline;
+  font-weight: 800;
+}
+
+.auth-container {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-icon {
+  color: $text-color;
+}
+
+.username {
+  color: $text-color;
+  font-size: 16px; /* Giảm kích thước font của tên người dùng */
+  font-weight: 500;
+}
+
+.auth-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.auth-btn {
+  color: $primary-color; /* Đổi màu chữ thành màu chính */
+  background-color: $text-color; /* Đặt nền màu trắng */
+  border: none; /* Bỏ đường viền của nút */
+  padding: 8px 16px; /* Thêm padding vừa phải cho nút */
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px; /* Bo góc nút */
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.auth-btn:hover {
+  background-color: $primary-color; /* Đổi màu nền khi hover */
+  color: $text-color; /* Đổi màu chữ khi hover */
+}
+
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+    padding: 15px 20px;
+  }
+
+  .nav-btn {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .nav-title {
+    font-size: 16px; /* Giảm font size cho nhỏ gọn trên màn hình di động */
+  }
+}

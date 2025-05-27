@@ -1,0 +1,24 @@
+.container{
+    background: #fff;
+    font-family: 'Roboto', sans-serif;
+    padding: 0;
+    margin: 0;
+    
+    .logo-title{
+        padding-left: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        .logo-img{
+            width: auto;
+            height: 60px;
+        }
+    
+        .title{
+            color: #F49976;
+            font-size: 50px;
+            font-weight: 700;
+        }
+    }
+}
