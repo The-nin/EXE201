@@ -24,7 +24,7 @@ function MainPage() {
   };
 
   return (
-    <Layout>
+    <Layout style={{ minHeight: "100vh" }}>
       <ToastContainer
         position="top-right"
         autoClose={3000}

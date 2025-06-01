@@ -1,0 +1,15 @@
+.fabric_actions{
+    display: flex;
+    gap: 10px;
+}
+
+.fabric_container{
+    padding: 24px;
+
+    .fabric_header{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+}
