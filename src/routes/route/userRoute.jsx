@@ -6,6 +6,8 @@ const LandingPage = lazy(() => import("../../pages/landingPage/index"));
 const AboutUsPage = lazy(() => import("../../pages/aboutUsPage/aboutUs"));
 const ProductPage = lazy(() => import("../../pages/productPage/product"));
 const ContactPage = lazy(() => import("../../pages/contactPage/contact"));
+
+
 const userRoutes = [
   {
     path: ROUTES.LANDING_PAGE,
@@ -31,6 +33,7 @@ const userRoutes = [
     path: ROUTES.CUSTOM_SHIRT_PAGE,
     element: <CustomShirtOrder />,
   },
+  
 ];
 
 export default userRoutes;

@@ -12,6 +12,7 @@ import {
   GiftOutlined,
   SolutionOutlined,
 } from "@ant-design/icons";
+import { GiRolledCloth } from "react-icons/gi";
 
 const { Sider } = Layout;
 
@@ -24,10 +25,10 @@ const Sidebar = ({ collapsed }) => {
   const permissions = {
     "/admin": ["ADMIN"],
     "/admin/account-management": ["ADMIN"],
-    // "/admin/product": ["ADMIN", "MANAGER", "STAFF"],
+    "/admin/product": ["ADMIN", "MANAGER", "STAFF"],
+    "/admin/category": ["ADMIN", "MANAGER"],
+    "/admin/fabric": ["ADMIN", "MANAGER"],
     // "/admin/order": ["ADMIN", "MANAGER", "STAFF", "DELIVERY"],
-    // "/admin/category": ["ADMIN", "MANAGER"],
-    // "/admin/brand": ["ADMIN", "MANAGER"],
     // "/admin/blog": ["ADMIN", "MANAGER", "EXPERT"],
     // "/admin/quiz": ["ADMIN", "MANAGER", "EXPERT"],
     // "/admin/voucher": ["ADMIN", "MANAGER"],
@@ -64,44 +65,9 @@ const Sidebar = ({ collapsed }) => {
       label: "Quản lý danh mục",
     },
     {
-      key: "/admin/brand",
-      icon: <AppstoreOutlined />,
-      label: "Quản lý thương hiệu",
-    },
-    {
-      key: "/admin/blog",
-      icon: <ReadOutlined />,
-      label: "Quản lý bài viết",
-    },
-    {
-      key: "/admin/quiz",
-      icon: <QuestionCircleOutlined />,
-      label: "Quản lý câu hỏi",
-    },
-    {
-      key: "/admin/voucher",
-      icon: <GiftOutlined />,
-      label: "Quản lý voucher",
-    },
-    {
-      key: "/admin/service",
-      icon: <CustomerServiceOutlined />,
-      label: "Quản lý dịch vụ",
-    },
-    {
-      key: "/admin/consultant-booking",
-      icon: <SolutionOutlined />,
-      label: "Quản lý đặt tư vấn",
-    },
-    {
-      key: "/admin/consultant-all-booking",
-      icon: <SolutionOutlined />,
-      label: "Quản lý đặt tư vấn",
-    },
-    {
-      key: "/admin/staff-manage-consultant-order",
-      icon: <SolutionOutlined />,
-      label: "Quản lý đặt tư vấn",
+      key: "/admin/fabric",
+      icon: <GiRolledCloth />,
+      label: "Quản lý loại vải",
     },
   ];
 
