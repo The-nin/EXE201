@@ -1,7 +1,7 @@
 // AboutUsPage.jsx
 import React, { useEffect } from "react";
 import { Container, Row, Col, Card, Button } from "react-bootstrap";
-import "./AboutUs.scss";
+import "./AboutUsPage.scss";
 
 export default function AboutUsPage() {
   useEffect(() => {
