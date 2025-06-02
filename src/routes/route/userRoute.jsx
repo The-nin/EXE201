@@ -2,8 +2,9 @@ import { lazy } from "react";
 import ROUTES from "../index";
 import CustomShirtOrder from "../../pages/customOrderPage/CustomShirtOrder";
 import ProductDetail from "../../components/ProductCard/ProductDetail";
+import AboutUsPage from "../../pages/aboutUsPage/aboutUs";
 const LandingPage = lazy(() => import("../../pages/landingPage/index"));
-const AboutUsPage = lazy(() => import("../../pages/aboutUsPage/aboutUs"));
+// const AboutUsPage = lazy(() => import("../../pages/aboutUsPage/aboutUs"));
 const ProductPage = lazy(() => import("../../pages/productPage/product"));
 const ContactPage = lazy(() => import("../../pages/contactPage/contact"));
 
