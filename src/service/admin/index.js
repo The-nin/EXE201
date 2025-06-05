@@ -55,4 +55,13 @@ const createFabric = async (data) => {
     }
 }
 
-export { getAllAccount, getAllCategory, createCategory, getAllFabric, createFabric }
+const getAllTypePrint = async () => {
+    try {
+        const response = await instance.get("/api/typePrint/all", authHeader);
+        return response.data.result;
+    } catch (error) {
+        console.log("error", error);
+    }
+}
+
+export { getAllAccount, getAllCategory, createCategory, getAllFabric, createFabric , getAllTypePrint}
