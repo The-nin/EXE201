@@ -96,3 +96,4 @@ export {
     getAllTypePrint, addTypePrint,
     createProduct,
 }
+
