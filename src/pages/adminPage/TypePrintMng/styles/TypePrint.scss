@@ -1,0 +1,15 @@
+.type_actions{
+    display: flex;
+    gap: 10px;
+}
+
+.type_container{
+    padding: 24px;
+
+    .type_header{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+}

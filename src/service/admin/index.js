@@ -7,6 +7,7 @@ const authHeader = {
     }
 }
 
+//Account Mng
 const getAllAccount = async () => {
     try {
         const response = await instance.get("/api/users/all", authHeader);
@@ -16,6 +17,7 @@ const getAllAccount = async () => {
     }
 }
 
+//Category Mng
 const getAllCategory = async () =>{
     try{
         const response = await instance.get("/api/category", authHeader);
@@ -36,6 +38,7 @@ const createCategory = async (data) => {
     }
 }
 
+//Fabric Mng
 const getAllFabric = async () => {
     try {
         const response = await instance.get("/api/fabric/all", authHeader);
@@ -55,4 +58,41 @@ const createFabric = async (data) => {
     }
 }
 
-export { getAllAccount, getAllCategory, createCategory, getAllFabric, createFabric }
+//Type Print Mng
+const getAllTypePrint = async () => {
+    try {
+        const response = await instance.get("/api/typePrint/all", authHeader);
+        console.log(response)
+        return response.data.result;
+    } catch (error) {
+        console.log("error", error);
+    }
+}
+
+const addTypePrint = async (data) => {
+    try {
+        const response = await instance.post("/api/typePrint", data, authHeader);
+        console.log(response)
+        return response.data;
+    } catch (error) {
+        console.log("error", error);
+    }
+}
+
+//Product Mng
+const createProduct = async (data) => {
+    try {
+        const response = await instance.post("/api/products", data, authHeader);
+        return response
+    } catch (error) {
+        console.log("Error:", error)
+    }
+}
+
+export { 
+    getAllAccount, 
+    getAllCategory, createCategory, 
+    getAllFabric, createFabric, 
+    getAllTypePrint, addTypePrint,
+    createProduct,
+}

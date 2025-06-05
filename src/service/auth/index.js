@@ -6,7 +6,8 @@ const login = async (username, password) => {
             username,
             password
         }, { withCredentials: true })
-        return response
+        console.log(response)
+        return response;
     } catch (error) {
         console.log("error", error);
     }
