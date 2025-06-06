@@ -10,42 +10,56 @@ import {
   Typography,
   message,
   Button,
+  Steps,
 } from "antd";
 import { EyeOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import {
   getAllBookOrders,
   getAllDesigner,
   assignDesigner,
+  cancelBookOrder,
+  getAddressId,
 } from "../../../service/admin";
 import "./styles/BookOrderMng.scss";
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
+const { Step } = Steps;
 
 const statusOrder = [
-  "CANCELED",
-  "FINISHED",
-  "DELIVERY",
-  "CUSTOMER_REJECTED",
-  "CUSTOMER_ACCEPTED",
-  "CUSTOMER_RECEIVED",
-  "ASSIGNED_TASK",
-  "PAYMENT",
   "PENDING",
+  "PAYMENT",
+  "ASSIGNED_TASK",
+  "DELIVERY",
+  "CUSTOMER_RECEIVED",
+  "CUSTOMER_ACCEPTED",
+  "CUSTOMER_REJECTED",
+  "FINISHED",
+  "CANCELED",
 ];
 
 const colorMap = {
   PENDING: "orange",
-  APPROVED: "green",
-  REJECTED: "red",
-  CANCELED: "red",
-  FINISHED: "blue",
-  DELIVERY: "purple",
-  CUSTOMER_REJECTED: "red",
-  CUSTOMER_ACCEPTED: "green",
-  CUSTOMER_RECEIVED: "cyan",
-  ASSIGNED_TASK: "geekblue",
   PAYMENT: "gold",
+  ASSIGNED_TASK: "geekblue",
+  DELIVERY: "purple",
+  CUSTOMER_RECEIVED: "cyan",
+  CUSTOMER_ACCEPTED: "green",
+  CUSTOMER_REJECTED: "red",
+  FINISHED: "blue",
+  CANCELED: "red",
+};
+
+const statusLabelMap = {
+  PENDING: "Chờ xử lý",
+  PAYMENT: "Đã thanh toán",
+  ASSIGNED_TASK: "Đã gán Designer",
+  DELIVERY: "Đang giao",
+  CUSTOMER_RECEIVED: "Khách đã nhận",
+  CUSTOMER_ACCEPTED: "Khách chấp nhận",
+  CUSTOMER_REJECTED: "Khách từ chối",
+  FINISHED: "Hoàn tất",
+  CANCELED: "Đã hủy",
 };
 
 function BookOrderMng() {
@@ -57,6 +71,8 @@ function BookOrderMng() {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [selectedDesignerId, setSelectedDesignerId] = useState("");
   const [cancelReason, setCancelReason] = useState("");
+  const [addressDetails, setAddressDetails] = useState(null);
+  const [addressLoading, setAddressLoading] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -67,12 +83,12 @@ function BookOrderMng() {
       ]);
 
       let ordersArr = Array.isArray(ordersRes) ? ordersRes : [];
-
       ordersArr.sort(
         (a, b) => statusOrder.indexOf(a.status) - statusOrder.indexOf(b.status)
       );
 
       setOrders(ordersArr);
+      console.log(ordersArr);
       setDesigners(Array.isArray(designersRes) ? designersRes : []);
     } catch (err) {
       console.error("Lỗi khi tải dữ liệu:", err);
@@ -82,17 +98,44 @@ function BookOrderMng() {
     }
   };
 
+  const fetchAddressDetails = async (selectedOrder) => {
+    try {
+      setAddressLoading(true);
+      const address = await getAddressId(selectedOrder.addressId);
+      setAddressDetails(address);
+      console.log("Address details:", address);
+    } catch (error) {
+      console.error("Failed to fetch address details:", error);
+      message.error("Không thể tải thông tin địa chỉ");
+      setAddressDetails(null);
+    } finally {
+      setAddressLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchData();
   }, []);
 
   const openDetailModal = (order) => {
+    console.log("Opening detail modal for order:", order);
     setSelectedOrder(order);
     setSelectedDesignerId(order.designerId || "");
     setDetailModalOpen(true);
+    fetchAddressDetails(order.addressId || {});
+    console.log("Address details:", addressDetails);
+    if (order.address_id) {
+      fetchAddressDetails(order.address_id);
+    } else {
+      setAddressDetails(null);
+      setAddressLoading(false);
+      console.warn("No address_id found in order:", order.id);
+      message.warning("Đơn hàng không có thông tin địa chỉ");
+    }
   };
 
   const openCancelModal = (order) => {
+    console.log("Opening cancel modal for order:", order);
     setSelectedOrder(order);
     setCancelReason("");
     setCancelModalOpen(true);
@@ -112,22 +155,17 @@ function BookOrderMng() {
 
     try {
       setLoading(true);
-
-      await assignDesigner(
-        {
-          designName: designerInfo.fullName,
-          designerId: designerInfo.id,
-          response: "",
-        },
-        selectedOrder.id
-      );
+      await assignDesigner(selectedOrder.id, {
+        designName: designerInfo.fullName,
+        designerId: designerInfo.designId,
+        response: "",
+      });
 
       message.success(
         `Đã gán Designer "${designerInfo.fullName}" cho đơn hàng #${selectedOrder.id}`
       );
 
-      await fetchData(); // reload từ server
-
+      await fetchData();
       setDetailModalOpen(false);
     } catch (error) {
       console.error("Gán Designer thất bại:", error);
@@ -137,19 +175,34 @@ function BookOrderMng() {
     }
   };
 
-  const handleCancelOrder = () => {
+  const handleCancelOrder = async () => {
     if (!cancelReason.trim()) {
-      message.error("Vui lòng nhập lý do huỷ đơn.");
+      message.error("Vui lòng nhập lý do hủy đơn.");
       return;
     }
 
-    message.success(`Đã huỷ đơn hàng #${selectedOrder.id}`);
-    setCancelModalOpen(false);
-    setOrders((prev) =>
-      prev.map((o) =>
-        o.id === selectedOrder.id ? { ...o, status: "REJECTED" } : o
-      )
-    );
+    console.log("Sending cancel request with:", {
+      id: selectedOrder.id,
+      response: cancelReason,
+    });
+
+    try {
+      setLoading(true);
+      const response = await cancelBookOrder(selectedOrder.id, cancelReason);
+      console.log("Cancel order response:", response);
+      message.success(`Đã hủy đơn hàng #${selectedOrder.id}`);
+      await fetchData();
+      setCancelModalOpen(false);
+      setCancelReason("");
+    } catch (err) {
+      console.error("Hủy đơn hàng thất bại:", err.response?.data || err);
+      const errorMessage =
+        err.response?.data?.message ||
+        "Hủy đơn hàng thất bại. Vui lòng thử lại.";
+      message.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const columns = [
@@ -160,17 +213,18 @@ function BookOrderMng() {
       width: 60,
     },
     {
-      title: "Số lượng",
-      dataIndex: "quantity",
-      key: "quantity",
-      width: 80,
-    },
-    {
       title: "Tên khách hàng",
       dataIndex: "customerName",
       key: "customerName",
       ellipsis: true,
       width: 150,
+    },
+    {
+      title: "Địa chỉ",
+      dataIndex: "address",
+      key: "address",
+      render: (address) => address || "--",
+      width: 200,
     },
     {
       title: "Ngày đặt",
@@ -190,7 +244,7 @@ function BookOrderMng() {
             width: 26,
             height: 26,
             borderRadius: 6,
-            backgroundColor: color,
+            backgroundColor: color || "#ccc",
             border: "1px solid #ddd",
           }}
         />
@@ -202,22 +256,24 @@ function BookOrderMng() {
       dataIndex: "status",
       key: "status",
       render: (status) => (
-        <Tag color={colorMap[status] || "default"}>{status}</Tag>
+        <Tag color={colorMap[status] || "default"}>
+          {statusLabelMap[status] || status}
+        </Tag>
       ),
-      width: 110,
+      width: 130,
     },
     {
       title: "Designer",
       dataIndex: "designName",
       key: "designName",
-      width: 150,
       render: (name) => name || "--",
+      width: 150,
     },
     {
       title: "Giá tổng",
       dataIndex: "totalPrice",
       key: "totalPrice",
-      render: (price) => `${price?.toFixed(2) || "0.00"}₫`,
+      render: (price) => `${(price ?? 0).toFixed(2)}₫`,
       width: 110,
     },
     {
@@ -237,9 +293,9 @@ function BookOrderMng() {
             type="link"
             icon={<CloseCircleOutlined />}
             danger
-            disabled={record.status === "REJECTED"}
+            disabled={record.status === "CANCELED"}
             onClick={() => openCancelModal(record)}
-            title="Huỷ đơn"
+            title="Hủy đơn"
           />
         </div>
       ),
@@ -258,7 +314,7 @@ function BookOrderMng() {
         rowKey="id"
         loading={loading}
         pagination={{ pageSize: 10 }}
-        scroll={{ x: 900 }}
+        scroll={{ x: 1100 }}
         bordered
       />
 
@@ -266,12 +322,23 @@ function BookOrderMng() {
       <Modal
         title={`Chi tiết đơn hàng #${selectedOrder?.id || ""}`}
         open={detailModalOpen}
-        onCancel={() => setDetailModalOpen(false)}
+        onCancel={() => {
+          setDetailModalOpen(false);
+          setAddressDetails(null);
+          setAddressLoading(false);
+        }}
         footer={[
-          <Button key="close" onClick={() => setDetailModalOpen(false)}>
+          <Button
+            key="close"
+            onClick={() => {
+              setDetailModalOpen(false);
+              setAddressDetails(null);
+              setAddressLoading(false);
+            }}
+          >
             Đóng
           </Button>,
-          !selectedOrder?.designerId && (
+          selectedOrder?.status === "PAYMENT" && !selectedOrder?.designerId && (
             <Button
               key="assign"
               type="primary"
@@ -282,121 +349,194 @@ function BookOrderMng() {
             </Button>
           ),
         ]}
-        width={600}
+        width={800}
       >
         {selectedOrder ? (
-          <div>
-            <Row gutter={[16, 12]}>
-              <Col span={10}>
-                <Text strong>Số lượng:</Text>
-              </Col>
-              <Col span={14}>{selectedOrder.quantity}</Col>
+          <Row gutter={32}>
+            <Col span={14}>
+              <Row gutter={[16, 12]}>
+                <Col span={10}>
+                  <Text strong>Tên khách hàng:</Text>
+                </Col>
+                <Col span={14}>{selectedOrder.customerName || "--"}</Col>
 
-              <Col span={10}>
-                <Text strong>Tên khách hàng:</Text>
-              </Col>
-              <Col span={14}>{selectedOrder.customerName || "--"}</Col>
+                <Col span={10}>
+                  <Text strong>Số điện thoại:</Text>
+                </Col>
+                <Col span={14}>{selectedOrder.user?.phone || "--"}</Col>
 
-              <Col span={10}>
-                <Text strong>Ngày đặt:</Text>
-              </Col>
-              <Col span={14}>
-                {selectedOrder.createdAt
-                  ? new Date(selectedOrder.createdAt).toLocaleDateString(
-                      "vi-VN"
-                    )
-                  : "--"}
-              </Col>
+                <Col span={10}>
+                  <Text strong>Địa chỉ giao hàng:</Text>
+                </Col>
+                <Col span={14}>{selectedOrder.address || "--"}</Col>
 
-              <Col span={10}>
-                <Text strong>Màu sắc:</Text>
-              </Col>
-              <Col span={14}>
-                <div
-                  style={{
-                    display: "inline-block",
-                    width: 28,
-                    height: 28,
-                    borderRadius: 8,
-                    backgroundColor: selectedOrder.color,
-                    border: "1px solid #ddd",
-                  }}
-                />
-              </Col>
+                <Col span={10}>
+                  <Text strong>ID Địa chỉ:</Text>
+                </Col>
+                <Col span={14}>{selectedOrder.address_id || "--"}</Col>
 
-              <Col span={10}>
-                <Text strong>Trạng thái:</Text>
-              </Col>
-              <Col span={14}>
-                <Tag color={colorMap[selectedOrder.status] || "default"}>
-                  {selectedOrder.status}
-                </Tag>
-              </Col>
+                <Col span={10}>
+                  <Text strong>Chi tiết địa chỉ:</Text>
+                </Col>
+                <Col span={14}>
+                  {addressLoading
+                    ? "Đang tải..."
+                    : addressDetails
+                    ? `${addressDetails.street || ""}, ${
+                        addressDetails.city || ""
+                      }`
+                    : "--"}
+                </Col>
 
-              <Col span={10}>
-                <Text strong>Designer đã gán:</Text>
-              </Col>
-              <Col span={14}>{selectedOrder.designerName || "--"}</Col>
+                <Col span={10}>
+                  <Text strong>Số lượng:</Text>
+                </Col>
+                <Col span={14}>{selectedOrder.quantity ?? "--"}</Col>
 
-              <Col span={10}>
-                <Text strong>Giá tổng:</Text>
-              </Col>
-              <Col span={14}>
-                {selectedOrder.totalPrice?.toFixed(2) || "0.00"}₫
-              </Col>
+                <Col span={10}>
+                  <Text strong>Size:</Text>
+                </Col>
+                <Col span={14}>{selectedOrder.size || "--"}</Col>
 
-              <Col span={10}>
-                <Text strong>Mô tả:</Text>
-              </Col>
-              <Col span={14}>
-                <Paragraph style={{ margin: 0 }}>
-                  {selectedOrder.description || "--"}
-                </Paragraph>
-              </Col>
+                <Col span={10}>
+                  <Text strong>Ngày đặt:</Text>
+                </Col>
+                <Col span={14}>
+                  {selectedOrder.createdAt
+                    ? new Date(selectedOrder.createdAt).toLocaleDateString(
+                        "vi-VN"
+                      )
+                    : "--"}
+                </Col>
 
-              <Col span={24} style={{ marginTop: 16 }}>
-                {!selectedOrder.designerId ? (
+                <Col span={10}>
+                  <Text strong>Màu sắc:</Text>
+                </Col>
+                <Col span={14}>
+                  <div
+                    style={{
+                      display: "inline-block",
+                      width: 28,
+                      height: 28,
+                      borderRadius: 8,
+                      backgroundColor: selectedOrder.color || "#ccc",
+                      border: "1px solid #ddd",
+                    }}
+                  />
+                </Col>
+
+                <Col span={10}>
+                  <Text strong>Trạng thái:</Text>
+                </Col>
+                <Col span={14}>
+                  <Tag color={colorMap[selectedOrder.status] || "default"}>
+                    {statusLabelMap[selectedOrder.status] ||
+                      selectedOrder.status}
+                  </Tag>
+                </Col>
+
+                <Col span={10}>
+                  <Text strong>Designer đã gán:</Text>
+                </Col>
+                <Col span={14}>{selectedOrder.designName || "--"}</Col>
+
+                <Col span={10}>
+                  <Text strong>Giá tổng:</Text>
+                </Col>
+                <Col span={14}>
+                  {(selectedOrder.totalPrice ?? 0).toFixed(2)}₫
+                </Col>
+
+                <Col span={10}>
+                  <Text strong>Mô tả:</Text>
+                </Col>
+                <Col span={14}>
+                  <Paragraph style={{ margin: 0 }}>
+                    {selectedOrder.description || "--"}
+                  </Paragraph>
+                </Col>
+
+                {selectedOrder.status === "CANCELED" && (
                   <>
-                    <Text strong>Chọn Designer để gán:</Text>
-                    <Select
-                      placeholder="Chọn Designer..."
-                      value={selectedDesignerId}
-                      onChange={setSelectedDesignerId}
-                      style={{ width: "100%", marginTop: 8 }}
-                      allowClear
-                    >
-                      {designers.map((designer) => (
-                        <Option key={designer.id} value={designer.id}>
-                          {designer.fullName}
-                        </Option>
-                      ))}
-                    </Select>
+                    <Col span={10}>
+                      <Text strong>Lý do hủy:</Text>
+                    </Col>
+                    <Col span={14}>
+                      <Paragraph style={{ margin: 0 }}>
+                        {selectedOrder.response || "--"}
+                      </Paragraph>
+                    </Col>
                   </>
-                ) : null}
-              </Col>
-            </Row>
-          </div>
+                )}
+
+                <Col span={24} style={{ marginTop: 16 }}>
+                  {selectedOrder.status === "PAYMENT" &&
+                  !selectedOrder.designerId ? (
+                    <>
+                      <Text strong>Chọn Designer để gán:</Text>
+                      <Select
+                        placeholder="Chọn Designer..."
+                        value={selectedDesignerId}
+                        onChange={setSelectedDesignerId}
+                        style={{ width: "100%", marginTop: 8 }}
+                        allowClear
+                      >
+                        {designers.map((designer) => (
+                          <Option key={designer.id} value={designer.id}>
+                            {designer.fullName}
+                          </Option>
+                        ))}
+                      </Select>
+                    </>
+                  ) : null}
+                </Col>
+              </Row>
+            </Col>
+
+            <Col span={10}>
+              <Steps
+                current={statusOrder.indexOf(selectedOrder.status)}
+                direction="vertical"
+                size="small"
+              >
+                {statusOrder.map((status) => (
+                  <Step
+                    key={status}
+                    title={statusLabelMap[status]}
+                    status={
+                      status === selectedOrder.status
+                        ? "process"
+                        : statusOrder.indexOf(status) <
+                          statusOrder.indexOf(selectedOrder.status)
+                        ? "finish"
+                        : "wait"
+                    }
+                  />
+                ))}
+              </Steps>
+            </Col>
+          </Row>
         ) : (
           <Text>Không có dữ liệu đơn hàng</Text>
         )}
       </Modal>
 
-      {/* Modal huỷ đơn */}
+      {/* Modal hủy đơn */}
       <Modal
-        title={`Huỷ đơn hàng #${selectedOrder?.id || ""}`}
+        title={`Hủy đơn hàng #${selectedOrder?.id || ""}`}
         open={cancelModalOpen}
         onCancel={() => setCancelModalOpen(false)}
         onOk={handleCancelOrder}
-        okText="Xác nhận huỷ"
-        okButtonProps={{ danger: true }}
+        okText="Xác nhận hủy"
+        okButtonProps={{ danger: true, loading }}
         width={500}
       >
-        <Text>Vui lòng nhập lý do huỷ đơn hàng:</Text>
+        <Text>Vui lòng nhập lý do hủy đơn hàng:</Text>
         <Input.TextArea
           rows={4}
           value={cancelReason}
           onChange={(e) => setCancelReason(e.target.value)}
-          placeholder="Lý do huỷ đơn..."
+          placeholder="Lý do hủy đơn..."
           maxLength={500}
           allowClear
           style={{ marginTop: 8 }}
