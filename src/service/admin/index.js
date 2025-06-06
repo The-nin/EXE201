@@ -7,6 +7,7 @@ const authHeader = {
     }
 }
 
+//Account Mng
 const getAllAccount = async () => {
     try {
         const response = await instance.get("/api/users/all", authHeader);
@@ -16,6 +17,7 @@ const getAllAccount = async () => {
     }
 }
 
+//Category Mng
 const getAllCategory = async () =>{
     try{
         const response = await instance.get("/api/category", authHeader);
@@ -36,6 +38,7 @@ const createCategory = async (data) => {
     }
 }
 
+//Fabric Mng
 const getAllFabric = async () => {
     try {
         const response = await instance.get("/api/fabric/all", authHeader);
@@ -55,42 +58,15 @@ const createFabric = async (data) => {
     }
 }
 
+//Type Print Mng
 const getAllTypePrint = async () => {
     try {
         const response = await instance.get("/api/typePrint/all", authHeader);
+        console.log(response)
         return response.data.result;
     } catch (error) {
         console.log("error", error);
     }
 }
-
-export const getAllBookOrders = async () => {
-    try {
-        const response = await instance.get("/api/bookOrder", authHeader);
-        return response.data.result;
-    } catch (error) {
-        console.log("error", error);
-    }
-}
-
-export const getAllDesigner = async () => {
-    try{    
-        const reponse = await instance.get("/api/users/designers", authHeader);
-        console.log(reponse)
-        return reponse.data.result;
-    } catch (error) {
-        console.log("error", error);
-    }
-}
-
-    export const assignDesigner = async (data, bookOrderId) => {
-        try {
-        const response = await instance.put(`/api/bookOrder/${bookOrderId}`, data, authHeader);
-            console.log(response)
-            return response.data;
-        } catch (error) {
-            console.log("error", error);
-        }
-    }
 
 export { getAllAccount, getAllCategory, createCategory, getAllFabric, createFabric , getAllTypePrint}

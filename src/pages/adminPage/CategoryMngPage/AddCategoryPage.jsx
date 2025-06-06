@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Button, Card, Form, Input, Upload } from "antd";
 import { ArrowLeftOutlined, UploadOutlined } from "@ant-design/icons";
-import { ToastContainer } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import "./styles/AddCategory.scss";
+import "react-toastify/dist/ReactToastify.css";
 import { createCategory } from "../../../service/admin";
+import "./styles/AddCategory.scss";
 
 export default function AddCategory() {
   const [form] = Form.useForm();
@@ -22,10 +23,13 @@ export default function AddCategory() {
       const response = await createCategory(requestData);
 
       if (response?.code === 201) {
-        navigate("/admin/category");
+        toast.success("Tạo danh mục thành công");
+        // navigate("/admin/category");
+        setTimeout(() => navigate("/admin/category"), 500);
       }
     } catch (error) {
       console.log("error", error);
+      toast.error("Tạo danh mục thất bại!!Hãy thử lại");
     } finally {
       setLoading(false);
     }
@@ -33,8 +37,12 @@ export default function AddCategory() {
 
   return (
     <div className="add-category-container">
-      <ToastContainer position="top-right" autoClose={3000} theme="light" />
-
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        theme="light"
+        zIndex={9999}
+      />
       <div className="add-category-wrapper">
         <Button
           icon={<ArrowLeftOutlined />}

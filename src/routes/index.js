@@ -13,13 +13,15 @@ const ROUTES = {
         LOGIN: "login",
         DASHBOARD: "dashboard",
         ACCOUNT_MNG: "account-management",
+        //
         PRODUCT_MNG: "product",
         ADD_PRODUCT: "add-product",
+        //
         CATEGORY_MNG: "category",
         ADD_CATEGORY: "add-category",
+        //
         FABRIC_MNG: "fabric",
         ADD_FABRIC: "add-fabric",
-        BOOKORDER: "bookOrder",
     },
     AUTH: {
         LOGIN: "login",

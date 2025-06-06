@@ -27,6 +27,12 @@ const FabricMng = lazy(() =>
 const AddFabricPage = lazy(() =>
   import("../../pages/adminPage/FabricMngPage/CreateFabric")
 );
+const TypePrintPage = lazy(() =>
+  import("../../pages/adminPage/TypePrintMng/TypePrintPage")
+);
+const AddTypePrintPage = lazy(() =>
+  import("../../pages/adminPage/TypePrintMng/AddTypePrint")
+);
 
 const adminRoute = [
   {
@@ -81,15 +87,6 @@ const adminRoute = [
           {
             path: ROUTES.ADMIN.ADD_FABRIC,
             element: <AddFabricPage />,
-          },
-        ],
-      },
-      {
-        path: ROUTES.ADMIN.BOOKORDER,
-        children: [
-          {
-            path: "",
-            element: <BookOrderMng />,
           },
         ],
       },
