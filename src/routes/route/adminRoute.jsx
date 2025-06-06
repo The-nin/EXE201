@@ -90,6 +90,15 @@ const adminRoute = [
           },
         ],
       },
+      {
+        path: ROUTES.ADMIN.BOOKORDER,
+        children: [
+          {
+            path: "",
+            element: <BookOrderMng />,
+          },
+        ],
+      },
     ],
   },
 ];

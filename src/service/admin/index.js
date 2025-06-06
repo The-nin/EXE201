@@ -1,4 +1,5 @@
 import { instance } from "../instance";
+import { bookOrder } from "../user";
 
 const token = localStorage.getItem("token");
 const authHeader = {
@@ -69,4 +70,30 @@ const getAllTypePrint = async () => {
     }
 }
 
+export const getAllBookOrders = async () => {
+    try{
+        const response = await instance.get("/api/bookOrder", authHeader);
+        return response.data.result;
+    }catch(error){
+        console.log("error", error);
+    }
+}
+
+export const getAllDesigner = async () => {
+    try{
+        const response = await instance.get("/api/users/designers", authHeader);
+        return response.data.result;
+    }catch(error){
+        console.log("error", error);
+    }
+}
+
+export const assignDesigner = async (bookOrderId,data) => {
+    try{
+        const response = await instance.get(`/api/bookOrder/${bookOrderId}`,data, authHeader);
+        return response.data.result;
+    }catch(error){
+        console.log("error", error);
+    }
+}
 export { getAllAccount, getAllCategory, createCategory, getAllFabric, createFabric , getAllTypePrint}

@@ -29,6 +29,7 @@ const Sidebar = ({ collapsed }) => {
     "/admin/product": ["ADMIN", "MANAGER", "STAFF"],
     "/admin/category": ["ADMIN", "MANAGER"],
     "/admin/fabric": ["ADMIN", "MANAGER"],
+    "/admin/bookOrder": ["ADMIN", "MANAGER", "STAFF"],
     // "/admin/order": ["ADMIN", "MANAGER", "STAFF", "DELIVERY"],
     // "/admin/blog": ["ADMIN", "MANAGER", "EXPERT"],
     // "/admin/quiz": ["ADMIN", "MANAGER", "EXPERT"],
@@ -69,6 +70,11 @@ const Sidebar = ({ collapsed }) => {
       key: "/admin/fabric",
       icon: <GiRolledCloth />,
       label: "Quản lý loại vải",
+    },
+    {
+      key: "/admin/bookOrder",
+      icon: <ReadOutlined />,
+      label: "Quản lý đơn hàng",
     },
   ];
 
