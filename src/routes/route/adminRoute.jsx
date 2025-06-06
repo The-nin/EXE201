@@ -2,6 +2,7 @@ import { lazy } from "react";
 import ROUTES from "../index";
 import MainPage from "../../pages/adminPage/MainPage/MainPage";
 import { ProtectedAdminRoute } from "../protectedRoute/ProtectedAdminRoute";
+import BookOrderMng from "../../pages/adminPage/BookOrderMngPage/BookOrderMng";
 const LoginAdmin = lazy(() =>
   import("../../pages/adminPage/LoginAdmin/LoginAdmin")
 );
@@ -80,6 +81,15 @@ const adminRoute = [
           {
             path: ROUTES.ADMIN.ADD_FABRIC,
             element: <AddFabricPage />,
+          },
+        ],
+      },
+      {
+        path: ROUTES.ADMIN.BOOKORDER,
+        children: [
+          {
+            path: "",
+            element: <BookOrderMng />,
           },
         ],
       },

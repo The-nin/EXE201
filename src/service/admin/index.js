@@ -64,4 +64,33 @@ const getAllTypePrint = async () => {
     }
 }
 
+export const getAllBookOrders = async () => {
+    try {
+        const response = await instance.get("/api/bookOrder", authHeader);
+        return response.data.result;
+    } catch (error) {
+        console.log("error", error);
+    }
+}
+
+export const getAllDesigner = async () => {
+    try{    
+        const reponse = await instance.get("/api/users/designers", authHeader);
+        console.log(reponse)
+        return reponse.data.result;
+    } catch (error) {
+        console.log("error", error);
+    }
+}
+
+    export const assignDesigner = async (data, bookOrderId) => {
+        try {
+        const response = await instance.put(`/api/bookOrder/${bookOrderId}`, data, authHeader);
+            console.log(response)
+            return response.data;
+        } catch (error) {
+            console.log("error", error);
+        }
+    }
+
 export { getAllAccount, getAllCategory, createCategory, getAllFabric, createFabric , getAllTypePrint}

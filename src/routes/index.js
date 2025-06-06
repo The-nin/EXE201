@@ -19,6 +19,7 @@ const ROUTES = {
         ADD_CATEGORY: "add-category",
         FABRIC_MNG: "fabric",
         ADD_FABRIC: "add-fabric",
+        BOOKORDER: "bookOrder",
     },
     AUTH: {
         LOGIN: "login",

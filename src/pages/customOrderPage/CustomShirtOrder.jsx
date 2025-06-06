@@ -85,8 +85,8 @@ function CustomShirtForm() {
       };
 
       const response = await bookOrder(payload);
-
-      if (response?.data?.code === 201) {
+      console.log(response);
+      if (response.code === 201) {
         alert("Đặt hàng thành công!");
         setFormData({
           size: "S",
