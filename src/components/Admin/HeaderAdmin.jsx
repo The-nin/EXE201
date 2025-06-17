@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Layout, Button, Avatar, Dropdown, Space, message } from "antd";
 import {
   MenuFoldOutlined,
@@ -14,22 +14,31 @@ const { Header } = Layout;
 
 const HeaderAdmin = ({ collapsed, toggleCollapsed, adminUser }) => {
   const navigate = useNavigate();
-  const onLogout = async () => {
-    try {
-      const token = localStorage.getItem("token"); // Assuming token is stored in localStorage
-      const response = await logout(token);
+  const [fullName, setFullName] = useState(null);
+  const [isAuth, setIsAuth] = useState(false);
+  // const onLogout = async () => {
+  //   try {
+  //     const token = localStorage.getItem("token"); // Assuming token is stored in localStorage
+  //     const response = await logout(token);
 
-      if (!response.error) {
-        localStorage.clear();
-        message.success("Logged out successfully");
-        navigate("/admin/login");
-      } else {
-        message.error(response.message || "Logout failed");
-      }
-    } catch (error) {
-      message.error("Failed to logout");
-      console.error("Logout error:", error);
-    }
+  //     if (!response.error) {
+  //       localStorage.clear();
+  //       message.success("Logged out successfully");
+  //       navigate("/admin/login");
+  //     } else {
+  //       message.error(response.message || "Logout failed");
+  //     }
+  //   } catch (error) {
+  //     message.error("Failed to logout");
+  //     console.error("Logout error:", error);
+  //   }
+  // };
+
+  const handleLogout = () => {
+    localStorage.clear();
+    setIsAuth(false);
+    setFullName(null);
+    navigate("/admin/login");
   };
 
   const dropdownItems = {
@@ -38,7 +47,7 @@ const HeaderAdmin = ({ collapsed, toggleCollapsed, adminUser }) => {
         key: "2",
         label: "Đăng xuất",
         icon: <LogoutOutlined />,
-        onClick: onLogout,
+        onClick: handleLogout,
         danger: true,
       },
     ],

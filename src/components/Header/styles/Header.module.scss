@@ -8,7 +8,7 @@ $active-color: #c24040;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 20px; /* Giảm padding để header nhỏ gọn hơn */
+  padding: 10px 20px;
   background: linear-gradient(to bottom, $primary-color 32%, $secondary-color 100%);
   font-family: 'Roboto', sans-serif;
   position: sticky;
@@ -28,13 +28,13 @@ $active-color: #c24040;
 }
 
 .logo-img {
-  height: 40px; /* Giảm chiều cao logo để header nhẹ nhàng hơn */
+  height: 40px;
   width: auto;
 }
 
 .title {
   color: $text-color;
-  font-size: 24px; /* Giảm kích thước font cho tiêu đề */
+  font-size: 24px;
   font-weight: 800;
   margin-left: 8px;
   margin-top: 15px;
@@ -53,7 +53,7 @@ $active-color: #c24040;
 }
 
 .nav-title {
-  font-size: 18px; /* Giảm kích thước font của các mục menu */
+  font-size: 18px;
   font-weight: 600;
   color: $text-color;
   text-decoration: none;
@@ -96,6 +96,7 @@ $active-color: #c24040;
   display: flex;
   align-items: center;
   gap: 10px;
+  cursor: pointer; 
 }
 
 .user-icon {
@@ -104,7 +105,7 @@ $active-color: #c24040;
 
 .username {
   color: $text-color;
-  font-size: 16px; /* Giảm kích thước font của tên người dùng */
+  font-size: 16px;
   font-weight: 500;
 }
 
@@ -114,19 +115,49 @@ $active-color: #c24040;
 }
 
 .auth-btn {
-  color: $primary-color; /* Đổi màu chữ thành màu chính */
-  background-color: $text-color; /* Đặt nền màu trắng */
-  border: none; /* Bỏ đường viền của nút */
-  padding: 8px 16px; /* Thêm padding vừa phải cho nút */
+  color: $primary-color;
+  background-color: $text-color;
+  border: none;
+  padding: 8px 16px;
   font-size: 16px;
   cursor: pointer;
-  border-radius: 5px; /* Bo góc nút */
+  border-radius: 5px;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .auth-btn:hover {
-  background-color: $primary-color; /* Đổi màu nền khi hover */
-  color: $text-color; /* Đổi màu chữ khi hover */
+  background-color: $primary-color;
+  color: $text-color;
+}
+
+.cart-btn {
+  color: $primary-color;
+  // background-color: $text-color;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.cart-btn:hover {
+  background: transparent !important;
+}
+
+.dropdown {
+  background: $text-color;
+  border-radius: 5px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  padding: 8px 0;
+}
+
+.dropdown-item {
+  color: $primary-color;
+  padding: 8px 16px;
+  text-decoration: none;
+  display: block;
+  transition: background-color 0.3s ease;
 }
 
 @media (max-width: 768px) {
@@ -144,6 +175,19 @@ $active-color: #c24040;
   }
 
   .nav-title {
-    font-size: 16px; /* Giảm font size cho nhỏ gọn trên màn hình di động */
+    font-size: 16px;
+  }
+
+  .user-info {
+    font-size: 14px;
+  }
+
+  .cart-btn {
+    padding: 6px 10px;
+  }
+
+  .auth-btn {
+    padding: 6px 12px;
+    font-size: 14px;
   }
 }

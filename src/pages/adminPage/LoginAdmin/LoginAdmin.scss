@@ -3,7 +3,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #0f172a; /* Equivalent to bg-slate-900 */
+  background-image: url("https://res.cloudinary.com/dntcdrfiq/image/upload/v1750179840/admin_bg_j33lad.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .login-card {

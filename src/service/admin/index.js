@@ -80,6 +80,15 @@ const addTypePrint = async (data) => {
 }
 
 //Product Mng
+const getAllProduct = async () => {
+    try {
+        const response = await instance.get("/api/products", authHeader);
+        return response.data.result;
+    } catch (error) {
+        console.log("Error: ", error);
+    }
+}
+
 const createProduct = async (data) => {
     try {
         const response = await instance.post("/api/products", data, authHeader);
@@ -94,5 +103,5 @@ export {
     getAllCategory, createCategory, 
     getAllFabric, createFabric, 
     getAllTypePrint, addTypePrint,
-    createProduct,
+    getAllProduct, createProduct,
 }

@@ -17,7 +17,7 @@ function LandingPage() {
     <div>
       <ProductCarousel />
 
-      <header className={headerStyles.header + " bg-white py-5"}>
+      <header className={headerStyles.header}>
         <Container>
           <Row className="align-items-center">
             <Col md={6}>

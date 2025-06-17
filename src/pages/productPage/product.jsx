@@ -2,15 +2,11 @@ import { Col, Divider, Row, Spin, Empty } from "antd";
 import ProductCard from "../../components/ProductCard/ProductCard";
 import ProductCarousel from "../../components/ProductCarousel/ProductCarousel";
 import { useEffect, useState } from "react";
-import { getAllProduct } from "../../service/user";
+import { getAllProduct } from "../../service/admin";
 
 export default function Product() {
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState([]);
-
-  const handleAddToCart = (product) => {
-    alert(`Đã thêm "${product.title}" vào giỏ hàng!`);
-  };
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -31,7 +27,9 @@ export default function Product() {
     <div style={{ padding: "24px" }}>
       <ProductCarousel />
 
-      <Divider orientation="center">Sản phẩm của chúng tôi</Divider>
+      <Divider orientation="center" className="product_header">
+        Sản phẩm của chúng tôi
+      </Divider>
 
       {loading ? (
         <Spin />
@@ -42,10 +40,10 @@ export default function Product() {
           {products.map((product) => (
             <Col key={product.id} xs={24} sm={12} md={8} lg={6}>
               <ProductCard
-                image={product.image}
-                title={product.title}
+                id={product.id}
+                image={product.imageThumbnail}
+                title={product.productName}
                 price={product.price}
-                onAddToCart={() => handleAddToCart(product)}
               />
             </Col>
           ))}

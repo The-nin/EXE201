@@ -653,7 +653,6 @@ export default function AddProduct() {
       setLoading(true);
       message.loading({ content: "Đang xử lý...", key: "addProduct" });
 
-      // 🔧 Validate required fields với kiểu dữ liệu chính xác
       if (!values.categoryId) {
         throw new Error("Vui lòng chọn danh mục");
       }
@@ -679,7 +678,6 @@ export default function AddProduct() {
         throw new Error("Vui lòng chọn ít nhất một kích thước");
       }
 
-      // Upload imageThumbnail to Cloudinary
       let imageThumbnailUrl = "";
       if (fileListThumbnail.length > 0) {
         try {
@@ -705,7 +703,6 @@ export default function AddProduct() {
         throw new Error("Vui lòng chọn ảnh đại diện");
       }
 
-      // Upload images to Cloudinary
       const imageUrls = [];
       if (fileListImages.length > 0) {
         try {
@@ -732,26 +729,23 @@ export default function AddProduct() {
         }
       }
 
-      // 🔧 Process sizes theo đúng format backend expects
       const sizes = values.size.map((s) => ({ size: s }));
 
-      // 🔧 Định dạng dữ liệu CHÍNH XÁC theo backend ProductCreateRequest
       const requestData = {
-        productName: String(values.productName).trim(), // String
-        price: Number(values.price), // Double (sẽ được convert thành Double ở backend)
-        description: String(values.description).trim(), // String
-        imageThumbnail: String(imageThumbnailUrl), // String
-        sizes: sizes, // List<SizeRequest> với {size: String}
-        categoryId: Number(values.categoryId), // Long (JavaScript number sẽ được convert)
-        color: String(values.color).trim(), // String
-        fabricId: Number(values.fabricId), // Long
-        typePrintId: Number(values.typePrintId), // Long
-        images: imageUrls, // List<ImageRequest> với {image: String}
+        productName: String(values.productName).trim(), 
+        price: Number(values.price), 
+        description: String(values.description).trim(), 
+        imageThumbnail: String(imageThumbnailUrl), 
+        sizes: sizes, 
+        categoryId: Number(values.categoryId), 
+        color: String(values.color).trim(), 
+        fabricId: Number(values.fabricId), 
+        typePrintId: Number(values.typePrintId), 
+        images: imageUrls, 
       };
 
       console.log("🚀 Request data (matching backend):", requestData);
 
-      // 🔧 Gọi API với headers chính xác
       const response = await createProduct(requestData);
       console.log("✅ API Response:", response);
 
@@ -762,7 +756,6 @@ export default function AddProduct() {
           duration: 2,
         });
 
-        // Reset form và navigate
         form.resetFields();
         setFileListThumbnail([]);
         setFileListImages([]);
