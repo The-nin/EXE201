@@ -26,6 +26,9 @@ const ROUTES = {
         ADD_FABRIC: "add-fabric",
         //
         BOOKORDER: "bookOrder",
+        //
+        TYPE_PRINT_MNG: "type-print",
+        ADD_TYPE_PRINT: "add-type-print",
     },
     AUTH: {
         LOGIN: "login",

@@ -106,6 +106,19 @@ const adminRoute = [
           },
         ],
       },
+      {
+        path: ROUTES.ADMIN.TYPE_PRINT_MNG,
+        children: [
+          {
+            path: "",
+            element: <TypePrintPage />,
+          },
+          {
+            path: ROUTES.ADMIN.ADD_TYPE_PRINT,
+            element: <AddTypePrintPage />,
+          },
+        ],
+      }
     ],
   },
 ];
