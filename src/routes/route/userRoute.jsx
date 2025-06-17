@@ -1,12 +1,13 @@
 import { lazy } from "react";
 import ROUTES from "../index";
 import CustomShirtOrder from "../../pages/customOrderPage/CustomShirtOrder";
-import ProductDetail from "../../components/ProductCard/ProductDetail";
+import ProductDetail from "../../pages/productPage/ProductDetail";
 const LandingPage = lazy(() => import("../../pages/landingPage/index"));
 const AboutUsPage = lazy(() => import("../../pages/aboutUsPage/AboutUsPage"));
 const ProductPage = lazy(() => import("../../pages/productPage/product"));
 const ContactPage = lazy(() => import("../../pages/contactPage/contact"));
-
+const ProfilePage = lazy(() => import("../../pages/profilePage/ProfilePage"));
+const CartPage = lazy(() => import("../../pages/cart/cart"));
 
 const userRoutes = [
   {
@@ -33,7 +34,14 @@ const userRoutes = [
     path: ROUTES.CUSTOM_SHIRT_PAGE,
     element: <CustomShirtOrder />,
   },
-  
+  {
+    path: ROUTES.PROFILE_PAGE,
+    element: <ProfilePage />,
+  },
+  {
+    path: ROUTES.CART_PAGE,
+    element: <CartPage />,
+  },
 ];
 
 export default userRoutes;

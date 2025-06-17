@@ -11,11 +11,15 @@ const { Content } = Layout;
 function MainPage() {
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
+  const [fullName, setFullName] = useState(null);
+  const [isAuth, setIsAuth] = useState(false);
   // const adminUser = JSON.parse(localStorage.getItem("role"));
   const role = localStorage.getItem("role");
 
   const handleLogout = () => {
-    localStorage.removeItem("adminUser");
+    localStorage.clear();
+    setIsAuth(false);
+    setFullName(null);
     navigate("/admin/login");
   };
 

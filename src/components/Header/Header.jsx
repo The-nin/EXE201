@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Image } from "react-bootstrap";
+import { Image, Button } from "react-bootstrap";
 import { Link, useLocation } from "react-router-dom";
-import Button from "react-bootstrap/Button";
-import { FiUser } from "react-icons/fi";
+import { FiUser, FiShoppingCart } from "react-icons/fi";
+import { Dropdown, Menu } from "antd";
 import header from "./styles/Header.module.scss";
 
 export default function Header() {
@@ -34,9 +34,35 @@ export default function Header() {
 
   const isActive = (path) => currentPath === path;
 
+  const userMenu = (
+    <Menu className={header["dropdown"]}>
+      <Menu.Item key="1">
+        <Link to="/profile" className={header["dropdown-item"]}>
+          Trang cá nhân
+        </Link>
+      </Menu.Item>
+      <Menu.Item key="2">
+        <Link to="/settings" className={header["dropdown-item"]}>
+          Lịch sử đặt hàng
+        </Link>
+      </Menu.Item>
+      <Menu.Item key="3">
+        <Link to="/settings" className={header["dropdown-item"]}>
+          Cài đặt
+        </Link>
+      </Menu.Item>
+      <Menu.Item
+        key="4"
+        onClick={handleLogout}
+        className={header["dropdown-item-logout"]}
+      >
+        Đăng xuất
+      </Menu.Item>
+    </Menu>
+  );
+
   return (
     <div className={header["container"]}>
-      {/* Logo Section */}
       <div className={header["logo-title"]}>
         <Link to="/" className={header["logo-name"]}>
           <Image
@@ -48,7 +74,6 @@ export default function Header() {
         </Link>
       </div>
 
-      {/* Navigation */}
       <div className={header["nav-btn"]}>
         <div className={header["nav"]}>
           <Link
@@ -85,17 +110,24 @@ export default function Header() {
           </Link>
         </div>
 
-        {/* User Button or Auth Links */}
         <div className={header["auth-container"]}>
           {isAuth ? (
             <>
               <div className={header["user-info"]}>
-                <FiUser size={24} className={header["user-icon"]} />
+                <Dropdown
+                  overlay={userMenu}
+                  trigger={["click"]}
+                  placement="bottomCenter"
+                >
+                  <FiUser size={24} className={header["user-icon"]} />
+                </Dropdown>
                 <span className={header["username"]}>{fullName}</span>
               </div>
-              <Button variant="outline-danger" onClick={handleLogout}>
-                Đăng xuất
-              </Button>
+              <Link to="/cart">
+                <Button variant="outline-light" className={header["cart-btn"]}>
+                  <FiShoppingCart size={24} className={header["user-icon"]} />
+                </Button>
+              </Link>
             </>
           ) : (
             <div className={header["auth-buttons"]}>

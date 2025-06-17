@@ -6,9 +6,24 @@ const authHeader = {
     }
 }
 
-const getAllProduct = async () => {
+
+const getProductDetail = async (id) => {
     try {
-        const response = await instance.get("/api/products/search")
+        const response = await instance.get(`/api/products/${id}`, authHeader)
+        return response.data.result
+    } catch (error) {
+        console.log("error", error);
+    }
+}
+
+const addToCart = async (productId, quantity) => {
+    try {
+        const response = await instance.post(`/carts`, authHeader,
+            {
+                productId,
+                quantity
+            }
+        )
         return response
     } catch (error) {
         console.log("error", error);
@@ -24,4 +39,4 @@ const getAllProduct = async () => {
     }
 }
 
-export { getAllProduct, bookOrder }
+export { bookOrder, getProductDetail, addToCart }

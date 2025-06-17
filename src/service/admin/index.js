@@ -69,6 +69,35 @@ const getAllTypePrint = async () => {
     }
 }
 
+const addTypePrint = async (data) => {
+    try {
+        const response = await instance.post("/api/typePrint", data, authHeader);
+        console.log(response)
+        return response.data;
+    } catch (error) {
+        console.log("error", error);
+    }
+}
+
+//Product Mng
+const getAllProduct = async () => {
+    try {
+        const response = await instance.get("/api/products", authHeader);
+        return response.data.result;
+    } catch (error) {
+        console.log("Error: ", error);
+    }
+}
+
+const createProduct = async (data) => {
+    try {
+        const response = await instance.post("/api/products", data, authHeader);
+        return response
+    } catch (error) {
+        console.log("Error:", error)
+    }
+}
+
 export const getAllBookOrders = async () => {
     try{
         const response = await instance.get("/api/bookOrder", authHeader);
@@ -131,4 +160,11 @@ export const getAddressId = async (id) => {
         console.log("error", error);
     }
 }
-export { getAllAccount, getAllCategory, createCategory, getAllFabric, createFabric , getAllTypePrint}
+
+export { 
+    getAllAccount, 
+    getAllCategory, createCategory, 
+    getAllFabric, createFabric, 
+    getAllTypePrint, addTypePrint,
+    getAllProduct, createProduct,
+}

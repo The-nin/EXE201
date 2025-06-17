@@ -70,6 +70,12 @@ function RegisterPage() {
     <Container
       fluid
       className="min-vh-100 d-flex justify-content-center align-items-center bg-light"
+      style={{
+        backgroundImage: `url(https://res.cloudinary.com/dntcdrfiq/image/upload/v1749145348/bg-01_x9olek.png)`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}
     >
       <Card className="w-100 shadow rounded-4" style={{ maxWidth: "1000px" }}>
         <Row className="g-0">
@@ -77,6 +83,11 @@ function RegisterPage() {
           <Col
             md={5}
             className="d-none d-md-flex bg-white justify-content-center align-items-center p-4"
+            style={{
+              overflow: "hidden",
+              borderTopLeftRadius: "1.5rem",
+              borderBottomLeftRadius: "1.5rem",
+            }}
           >
             <div>
               {!imageLoaded && (

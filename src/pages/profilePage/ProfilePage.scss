@@ -1,0 +1,41 @@
+.profile_container{
+
+    .profile_card{
+        border-radius: 24px;
+        background-color: white;
+        margin-top: 50px;
+        box-shadow: "0 10px 10px rgba(0, 0, 0, 0.1)";
+        border: 1px solid #F89868; 
+        display: flex;
+        justify-content: space-between;
+
+        .upper_row{
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            
+
+            .left_col1{
+                .profile_title{
+                    color: #A78283;
+                    font-size: 80px;
+                    font-weight: bold;
+                }
+
+                .input_field{
+                    display: flex;
+                    align-items: center;
+                    margin-top: 10px;
+                }
+
+                
+            }
+
+            .right_col1{
+                .avatar{
+                    border-radius: 50%;
+                }
+            }
+        }
+    }
+}
