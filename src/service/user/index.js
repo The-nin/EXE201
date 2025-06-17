@@ -1,11 +1,11 @@
 import { instance } from "../instance";
-
 const token = localStorage.getItem("token");
 const authHeader = {
     headers: {
         Authorization: `Bearer ${token}`
     }
 }
+
 
 const getProductDetail = async (id) => {
     try {
@@ -30,4 +30,13 @@ const addToCart = async (productId, quantity) => {
     }
 }
 
-export { getProductDetail, addToCart }
+ const bookOrder = async(data) => {
+    try{
+        const response = await instance.post("/api/bookOrder", data, authHeader)   
+        return response.data
+    }catch(error){
+        console.log("error", error);
+    }
+}
+
+export { bookOrder, getProductDetail, addToCart }

@@ -98,6 +98,69 @@ const createProduct = async (data) => {
     }
 }
 
+export const getAllBookOrders = async () => {
+    try{
+        const response = await instance.get("/api/bookOrder", authHeader);
+        return response.data.result;
+    }catch(error){
+        console.log("error", error);
+    }
+}
+
+export const getAllDesigner = async () => {
+    try{
+        const response = await instance.get("/api/users/designers", authHeader);
+        return response.data.result;
+    }catch(error){
+        console.log("error", error);
+    }
+}
+
+export const assignDesigner = async (bookOrderId, data) => {
+  try {
+    const response = await instance.put(
+      `/api/bookOrder/${bookOrderId}`,
+      data, authHeader
+    );
+    return response.data ;
+  } catch (error) {
+    console.error("Lỗi khi gán designer:", error);
+    throw error;
+  }
+};
+
+export const   getAddressByUser = async () => {
+    try{
+        const response = await instance.get("/api/addresses", authHeader);
+        return response.data;
+    }catch(error){
+        console.log("error", error);
+    }
+}
+
+export const cancelBookOrder = async (id, response) => {
+  try {
+    console.log("Sending DELETE request:", { id, response, headers: authHeader.headers });
+    const res = await instance.delete(`/api/bookOrder/${id}`, {
+      headers: authHeader.headers, // Gửi header xác thực
+      data: { response }, 
+    });
+    return res.data; // Trả về res.data để khớp với code gốc
+  } catch (error) {
+    console.error("Error cancelling order:", error.response?.data?.message || error.message);
+    throw error;
+  }
+};
+
+export const getAddressId = async (id) => {
+    try{
+        const response = await instance.get(`/api/addresses/${id}`, authHeader);
+        return response.data;
+    }catch(error){
+        console.log("error", error);
+    }
+}
+
 export { 
     getAllAccount, 
     getAllCategory, createCategory, 
