@@ -25,12 +25,15 @@ import {
   FiUser,
   FiPhone,
 } from "react-icons/fi";
+import { deleteCart, getCart, updateCart } from "../../service/user";
+import { toast } from "react-toastify";
 
 export default function Cart() {
   const navigate = useNavigate();
 
+  const [cart, setCart] = useState([]);
   const [cartItems, setCartItems] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [itemToRemove, setItemToRemove] = useState(null);
 
@@ -46,50 +49,21 @@ export default function Cart() {
     note: "",
   });
 
-  // Mock data cho demo
+  const fetchCart = async () => {
+    setLoading(true);
+    try {
+      const response = await getCart();
+      setCart(response);
+      setCartItems(response.items);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const mockCartItems = [
-      {
-        id: "cart1",
-        productId: "1",
-        productName: "Áo Thun Cotton Premium",
-        price: 299000,
-        quantity: 2,
-        size: "L",
-        sizeId: "3",
-        color: "Xanh Navy",
-        image: "https://via.placeholder.com/150x150/007bff/ffffff?text=Ao+1",
-        inStock: true,
-        maxQuantity: 10,
-      },
-      {
-        id: "cart2",
-        productId: "2",
-        productName: "Áo Polo Nam Cao Cấp",
-        price: 450000,
-        quantity: 1,
-        size: "M",
-        sizeId: "2",
-        color: "Trắng",
-        image: "https://via.placeholder.com/150x150/28a745/ffffff?text=Ao+2",
-        inStock: true,
-        maxQuantity: 5,
-      },
-      {
-        id: "cart3",
-        productId: "3",
-        productName: "Áo Sơ Mi Công Sở",
-        price: 380000,
-        quantity: 1,
-        size: "XL",
-        sizeId: "4",
-        color: "Xanh Đậm",
-        image: "https://via.placeholder.com/150x150/dc3545/ffffff?text=Ao+3",
-        inStock: false,
-        maxQuantity: 0,
-      },
-    ];
-    setCartItems(mockCartItems);
+    fetchCart();
   }, []);
 
   const formatPrice = (price) => {
@@ -99,36 +73,47 @@ export default function Cart() {
     }).format(price);
   };
 
-  const handleQuantityChange = (itemId, type) => {
-    setCartItems((prevItems) =>
-      prevItems.map((item) => {
-        if (item.id === itemId) {
-          let newQuantity = item.quantity;
-
-          if (type === "increase" && item.quantity < item.maxQuantity) {
-            newQuantity = item.quantity + 1;
-          } else if (type === "decrease" && item.quantity > 1) {
-            newQuantity = item.quantity - 1;
-          }
-
-          return { ...item, quantity: newQuantity };
-        }
-        return item;
-      })
-    );
+  const handleQuantityChange = async (productId, newQuantity) => {
+    try {
+      const response = await updateCart(productId, newQuantity);
+      if (response.data.code === 200) {
+        toast.success(response.data.message);
+      }
+      setCartItems((prevItems) =>
+        prevItems.map((item) =>
+          item.productId === productId
+            ? {
+                ...item,
+                quantity: newQuantity,
+                totalItemPrice: item.price * newQuantity,
+              }
+            : item
+        )
+      );
+    } catch (error) {
+      console.error("Có lỗi trong việc thay đổi số lượng:", error);
+    }
   };
 
-  const handleRemoveItem = (item) => {
+  const handleDeleteItem = (item) => {
     setItemToRemove(item);
     setShowRemoveModal(true);
   };
+  console.log(itemToRemove?.productId);
 
-  const confirmRemoveItem = () => {
-    setCartItems((prevItems) =>
-      prevItems.filter((item) => item.id !== itemToRemove.id)
-    );
-    setShowRemoveModal(false);
-    setItemToRemove(null);
+  const confirmRemoveItem = async (productId) => {
+    console.log(productId);
+    try {
+      const response = await deleteCart(productId);
+      console.log(response);
+      // if (response.data.code === 200) {
+      //   toast.success("Xóa thành công");
+      // } else {
+      //   toast.error(response.message);
+      // }
+    } catch (err) {
+      console.error("Có lỗi trong việc xóa:", err);
+    }
   };
 
   const handleClearCart = () => {
@@ -231,7 +216,7 @@ export default function Cart() {
               </Button>
               <h2 className="mb-0">
                 <FiShoppingCart className="me-2" />
-                Giỏ hàng ({cartItems.length})
+                Giỏ hàng ({cartItems?.length})
               </h2>
             </div>
             {cartItems.length > 0 && (
@@ -258,7 +243,7 @@ export default function Cart() {
                 <Button
                   variant="primary"
                   size="lg"
-                  onClick={() => navigate("/products")}
+                  onClick={() => navigate(-1)}
                 >
                   Khám phá sản phẩm
                 </Button>
@@ -288,14 +273,14 @@ export default function Cart() {
                   <tbody>
                     {cartItems.map((item) => (
                       <tr
-                        key={item.id}
-                        className={!item.inStock ? "table-warning" : ""}
+                        key={item.productId}
+                        // className={!item.inStock ? "table-warning" : ""}
                       >
                         <td>
                           <div className="d-flex align-items-center">
                             <img
-                              src={item.image || "/placeholder.svg"}
-                              alt={item.productName}
+                              src={item?.image || "/placeholder.svg"}
+                              alt={item?.productName}
                               className="rounded me-3"
                               style={{
                                 width: "80px",
@@ -304,21 +289,21 @@ export default function Cart() {
                               }}
                             />
                             <div>
-                              <h6 className="mb-1">{item.productName}</h6>
+                              <h6 className="mb-1">{item?.productName}</h6>
                               <div className="text-muted small">
-                                <div>Màu: {item.color}</div>
-                                <div>Size: {item.size}</div>
-                                {!item.inStock && (
+                                <div>Màu: {item?.color}</div>
+                                <div>Size: {item?.size}</div>
+                                {/* {!item.inStock && (
                                   <Badge bg="warning" text="dark">
                                     Hết hàng
                                   </Badge>
-                                )}
+                                )} */}
                               </div>
                             </div>
                           </div>
                         </td>
                         <td className="align-middle">
-                          <strong>{formatPrice(item.price)}</strong>
+                          <strong>{formatPrice(item?.price)}</strong>
                         </td>
                         <td className="align-middle">
                           <div className="d-flex align-items-center gap-2">
@@ -326,9 +311,12 @@ export default function Cart() {
                               variant="outline-secondary"
                               size="sm"
                               onClick={() =>
-                                handleQuantityChange(item.id, "decrease")
+                                handleQuantityChange(
+                                  item.productId,
+                                  item.quantity - 1
+                                )
                               }
-                              disabled={item.quantity <= 1 || !item.inStock}
+                              disabled={item.quantity <= 1}
                             >
                               <FiMinus />
                             </Button>
@@ -336,18 +324,18 @@ export default function Cart() {
                               className="mx-2"
                               style={{ minWidth: "30px", textAlign: "center" }}
                             >
-                              {item.quantity}
+                              {item?.quantity}
                             </span>
                             <Button
                               variant="outline-secondary"
                               size="sm"
                               onClick={() =>
-                                handleQuantityChange(item.id, "increase")
+                                handleQuantityChange(
+                                  item.productId,
+                                  item.quantity + 1
+                                )
                               }
-                              disabled={
-                                item.quantity >= item.maxQuantity ||
-                                !item.inStock
-                              }
+                              // disabled={cartItems.quantity >= cartItems.stock}
                             >
                               <FiPlus />
                             </Button>
@@ -367,7 +355,7 @@ export default function Cart() {
                           <Button
                             variant="outline-danger"
                             size="sm"
-                            onClick={() => handleRemoveItem(item)}
+                            onClick={() => handleDeleteItem(item)}
                           >
                             <FiTrash2 />
                           </Button>
@@ -640,32 +628,14 @@ export default function Cart() {
         <Modal.Header closeButton>
           <Modal.Title>Xác nhận xóa sản phẩm</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-          {itemToRemove && (
-            <div>
-              <p>Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?</p>
-              <div className="d-flex align-items-center">
-                <img
-                  src={itemToRemove.image || "/placeholder.svg"}
-                  alt={itemToRemove.productName}
-                  className="rounded me-3"
-                  style={{ width: "60px", height: "60px", objectFit: "cover" }}
-                />
-                <div>
-                  <h6 className="mb-1">{itemToRemove.productName}</h6>
-                  <div className="text-muted small">
-                    Size: {itemToRemove.size} | Màu: {itemToRemove.color}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowRemoveModal(false)}>
             Hủy
           </Button>
-          <Button variant="danger" onClick={confirmRemoveItem}>
+          <Button
+            variant="danger"
+            onClick={() => confirmRemoveItem(itemToRemove?.productId)}
+          >
             <FiTrash2 className="me-2" />
             Xóa sản phẩm
           </Button>
