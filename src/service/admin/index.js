@@ -62,7 +62,6 @@ const createFabric = async (data) => {
 const getAllTypePrint = async () => {
     try {
         const response = await instance.get("/api/typePrint/all", authHeader);
-        console.log(response)
         return response.data.result;
     } catch (error) {
         console.log("error", error);
@@ -72,7 +71,6 @@ const getAllTypePrint = async () => {
 const addTypePrint = async (data) => {
     try {
         const response = await instance.post("/api/typePrint", data, authHeader);
-        console.log(response)
         return response.data;
     } catch (error) {
         console.log("error", error);

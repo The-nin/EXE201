@@ -67,7 +67,7 @@ function ProductMng() {
       key: "images",
       width: 200,
       render: (images) => {
-        if (!images || !Array.isArray(images) || images.length === 0) {
+        if (!images || !Array.isArray(images) || images?.length === 0) {
           return <Typography.Text type="secondary">No images</Typography.Text>;
         }
         return (
@@ -97,7 +97,7 @@ function ProductMng() {
       key: "sizes",
       width: 150,
       render: (sizes) => {
-        if (!sizes || !Array.isArray(sizes) || sizes.length === 0) {
+        if (!sizes || !Array.isArray(sizes) || sizes?.length === 0) {
           return <Typography.Text type="secondary">No sizes</Typography.Text>;
         }
 
@@ -148,6 +148,8 @@ function ProductMng() {
       },
     },
   ];
+
+  if (!products) return <div>Loading...</div>;
 
   return (
     <div className="product_container">

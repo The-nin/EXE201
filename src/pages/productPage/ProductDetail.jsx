@@ -20,9 +20,10 @@ import {
   FiTruck,
   FiShield,
   FiRefreshCw,
+  FiArrowLeft,
 } from "react-icons/fi";
 import { addToCart, getProductDetail } from "../../service/user";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { all } from "axios";
 
 const mockProduct = {
@@ -40,13 +41,14 @@ export default function ProductDetail() {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState("");
-  const [isFavorite, setIsFavorite] = useState(false);
+  // const [isFavorite, setIsFavorite] = useState(false);
   const [product, setProduct] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
   const [hoveredSizeId, setHoveredSizeId] = useState(null);
 
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const handleQuantityChange = (type) => {
     if (type === "increase") {
@@ -61,7 +63,6 @@ export default function ProductDetail() {
       setLoading(true);
       try {
         const response = await getProductDetail(id);
-        console.log(response);
         setProduct(response);
       } catch (error) {
         console.log(error);
@@ -74,8 +75,15 @@ export default function ProductDetail() {
   }, []);
 
   const handleAddToCart = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      // You might want to handle this case - redirect to login or show login modal
+      // toast.error("Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng");
+      return;
+    }
+
     try {
-      const response = await addToCart(id, quantity);
+      const response = await addToCart(product.id, quantity, selectedSize.size);
       console.log("Thêm vào giỏ hàng thành công:", response);
     } catch (error) {
       console.error("Có lỗi:", error);
@@ -147,10 +155,19 @@ export default function ProductDetail() {
 
   const allImages = getAllImages();
 
-  console.log(product);
-
   return (
     <Container className="py-5">
+      <div className="d-flex align-items-center mb-4">
+        <Button
+          variant="outline-secondary"
+          className="me-3"
+          onClick={() => navigate("/product")}
+        >
+          <FiArrowLeft className="me-2" />
+          Tiếp tục mua sắm
+        </Button>
+      </div>
+
       <Row className="mb-5">
         {/* Product Images */}
         <Col lg={6} className="mb-4 mb-lg-0">

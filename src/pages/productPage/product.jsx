@@ -10,8 +10,10 @@ export default function Product() {
 
   useEffect(() => {
     const fetchProducts = async () => {
+      setLoading(true);
       try {
         const res = await getAllProduct();
+        console.log(res);
         setProducts(res);
       } catch (error) {
         console.error("Lỗi khi gọi API:", error);
@@ -33,7 +35,7 @@ export default function Product() {
 
       {loading ? (
         <Spin />
-      ) : products.length === 0 ? (
+      ) : !Array.isArray(products) || products?.length === 0 ? (
         <Empty description="Không có sản phẩm nào" />
       ) : (
         <Row gutter={[16, 24]} justify="center">
