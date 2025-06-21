@@ -164,11 +164,11 @@ export default function Cart() {
       return;
     }
 
-    const outOfStockItems = cartItems.filter((item) => !item.inStock);
-    if (outOfStockItems.length > 0) {
-      alert("Có sản phẩm hết hàng trong giỏ hàng. Vui lòng xóa hoặc thay thế!");
-      return;
-    }
+    // const outOfStockItems = cartItems.filter((item) => !item.inStock);
+    // if (outOfStockItems.length > 0) {
+    //   alert("Có sản phẩm hết hàng trong giỏ hàng. Vui lòng xóa hoặc thay thế!");
+    //   return;
+    // }
 
     if (!validateAddress()) {
       alert("Vui lòng điền đầy đủ thông tin địa chỉ nhận hàng!");
