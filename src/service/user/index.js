@@ -30,7 +30,23 @@ const addToCart = async (productId, quantity, size) => {
         console.log("error", error);
     }
 }
+export const paymentSuccess = async (id) => {
+    try{
+        const response = await instance.patch(`/api/bookOrder/${id}`, null, authHeader);
+        return response.data;
+    }catch(error){
+        console.log("error", error);
+    }
+}
 
+export const paymentBookOrder = async (orderCode , amount) => {
+    try{
+        const response = await instance.post(`/api/payment/payOs`, {orderCode , amount}, authHeader);
+        return response.data;
+    }catch(error){
+        console.log("error", error);
+    }
+}
 const bookOrder = async(data) => {
     try{
         const response = await instance.post("/api/bookOrder", data, getAuthHeader())   

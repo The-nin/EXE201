@@ -84,11 +84,13 @@ function BookOrderMng() {
 
       let ordersArr = Array.isArray(ordersRes) ? ordersRes : [];
       ordersArr.sort(
-        (a, b) => statusOrder.indexOf(a.status) - statusOrder.indexOf(b.status)
+        (a, b) =>
+          statusOrder.indexOf(a.enumBookOrder) -
+          statusOrder.indexOf(b.enumBookOrder)
       );
 
       setOrders(ordersArr);
-      console.log(ordersArr);
+      console.log("Orders:", ordersArr);
       setDesigners(Array.isArray(designersRes) ? designersRes : []);
     } catch (err) {
       console.error("Lỗi khi tải dữ liệu:", err);
@@ -98,10 +100,10 @@ function BookOrderMng() {
     }
   };
 
-  const fetchAddressDetails = async (selectedOrder) => {
+  const fetchAddressDetails = async (addressId) => {
     try {
       setAddressLoading(true);
-      const address = await getAddressId(selectedOrder.addressId);
+      const address = await getAddressId(addressId);
       setAddressDetails(address);
       console.log("Address details:", address);
     } catch (error) {
@@ -122,14 +124,15 @@ function BookOrderMng() {
     setSelectedOrder(order);
     setSelectedDesignerId(order.designerId || "");
     setDetailModalOpen(true);
-    fetchAddressDetails(order.addressId || {});
-    console.log("Address details:", addressDetails);
-    if (order.address_id) {
-      fetchAddressDetails(order.address_id);
+
+    // Use consistent addressId key
+    const addrId = order.addressId || order.address_id;
+    if (addrId) {
+      fetchAddressDetails(addrId);
     } else {
       setAddressDetails(null);
       setAddressLoading(false);
-      console.warn("No address_id found in order:", order.id);
+      console.warn("No address id found in order:", order.id);
       message.warning("Đơn hàng không có thông tin địa chỉ");
     }
   };
@@ -157,7 +160,7 @@ function BookOrderMng() {
       setLoading(true);
       await assignDesigner(selectedOrder.id, {
         designName: designerInfo.fullName,
-        designerId: designerInfo.designId,
+        designerId: designerInfo.id,
         response: "",
       });
 
@@ -223,13 +226,18 @@ function BookOrderMng() {
       title: "Địa chỉ",
       dataIndex: "address",
       key: "address",
-      render: (address) => address || "--",
+      render: (address) =>
+        address
+          ? `${address?.street || "--"},${address?.ward || "--"} ,${
+              address?.city || "--"
+            }`
+          : "--",
       width: 200,
     },
     {
       title: "Ngày đặt",
-      dataIndex: "createdAt",
-      key: "createdAt",
+      dataIndex: "createdDate",
+      key: "createdDate",
       render: (value) =>
         value ? new Date(value).toLocaleDateString("vi-VN") : "--",
       width: 110,
@@ -253,8 +261,8 @@ function BookOrderMng() {
     },
     {
       title: "Trạng thái",
-      dataIndex: "status",
-      key: "status",
+      dataIndex: "enumBookOrder",
+      key: "enumBookOrder",
       render: (status) => (
         <Tag color={colorMap[status] || "default"}>
           {statusLabelMap[status] || status}
@@ -293,7 +301,7 @@ function BookOrderMng() {
             type="link"
             icon={<CloseCircleOutlined />}
             danger
-            disabled={record.status === "CANCELED"}
+            disabled={record.enumBookOrder === "CANCELED"}
             onClick={() => openCancelModal(record)}
             title="Hủy đơn"
           />
@@ -338,16 +346,17 @@ function BookOrderMng() {
           >
             Đóng
           </Button>,
-          selectedOrder?.status === "PAYMENT" && !selectedOrder?.designerId && (
-            <Button
-              key="assign"
-              type="primary"
-              onClick={handleAssignDesigner}
-              disabled={!selectedDesignerId}
-            >
-              Gán Designer
-            </Button>
-          ),
+          selectedOrder?.enumBookOrder === "PAYMENT" &&
+            !selectedOrder?.designerId && (
+              <Button
+                key="assign"
+                type="primary"
+                onClick={handleAssignDesigner}
+                disabled={!selectedDesignerId}
+              >
+                Gán Designer
+              </Button>
+            ),
         ]}
         width={800}
       >
@@ -366,25 +375,13 @@ function BookOrderMng() {
                 <Col span={14}>{selectedOrder.user?.phone || "--"}</Col>
 
                 <Col span={10}>
-                  <Text strong>Địa chỉ giao hàng:</Text>
-                </Col>
-                <Col span={14}>{selectedOrder.address || "--"}</Col>
-
-                <Col span={10}>
-                  <Text strong>ID Địa chỉ:</Text>
-                </Col>
-                <Col span={14}>{selectedOrder.address_id || "--"}</Col>
-
-                <Col span={10}>
                   <Text strong>Chi tiết địa chỉ:</Text>
                 </Col>
                 <Col span={14}>
-                  {addressLoading
-                    ? "Đang tải..."
-                    : addressDetails
-                    ? `${addressDetails.street || ""}, ${
-                        addressDetails.city || ""
-                      }`
+                  {selectedOrder
+                    ? `${selectedOrder.address?.street || ""}, ${
+                        selectedOrder.address?.ward || ""
+                      }, ${selectedOrder.address?.district || ""}`
                     : "--"}
                 </Col>
 
@@ -402,8 +399,8 @@ function BookOrderMng() {
                   <Text strong>Ngày đặt:</Text>
                 </Col>
                 <Col span={14}>
-                  {selectedOrder.createdAt
-                    ? new Date(selectedOrder.createdAt).toLocaleDateString(
+                  {selectedOrder.createdDate
+                    ? new Date(selectedOrder.createdDate).toLocaleDateString(
                         "vi-VN"
                       )
                     : "--"}
@@ -429,9 +426,11 @@ function BookOrderMng() {
                   <Text strong>Trạng thái:</Text>
                 </Col>
                 <Col span={14}>
-                  <Tag color={colorMap[selectedOrder.status] || "default"}>
-                    {statusLabelMap[selectedOrder.status] ||
-                      selectedOrder.status}
+                  <Tag
+                    color={colorMap[selectedOrder.enumBookOrder] || "default"}
+                  >
+                    {statusLabelMap[selectedOrder.enumBookOrder] ||
+                      selectedOrder.enumBookOrder}
                   </Tag>
                 </Col>
 
@@ -456,46 +455,50 @@ function BookOrderMng() {
                   </Paragraph>
                 </Col>
 
-                {selectedOrder.status === "CANCELED" && (
+                <Col span={10}>
+                  <Text strong>Hình ảnh:</Text>
+                </Col>
+                <Col span={14}>
+                  {Array.isArray(selectedOrder.imageSkins) &&
+                  selectedOrder.imageSkins.length > 0 ? (
+                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                      {selectedOrder.imageSkins.map((img) => (
+                        <img
+                          key={img.id}
+                          src={img.image} // Nếu ảnh là base64 thì thêm prefix: `data:image/jpeg;base64,${img.image}`
+                          alt="Skin"
+                          style={{
+                            width: 80,
+                            height: 80,
+                            objectFit: "cover",
+                            border: "1px solid #ccc",
+                            borderRadius: 4,
+                          }}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <Text>Không có hình ảnh</Text>
+                  )}
+                </Col>
+
+                {selectedOrder.enumBookOrder === "CANCELED" && (
                   <>
                     <Col span={10}>
                       <Text strong>Lý do hủy:</Text>
                     </Col>
                     <Col span={14}>
-                      <Paragraph style={{ margin: 0 }}>
-                        {selectedOrder.response || "--"}
-                      </Paragraph>
+                      {selectedOrder.response || "Không có lý do"}
                     </Col>
                   </>
                 )}
-
-                <Col span={24} style={{ marginTop: 16 }}>
-                  {selectedOrder.status === "PAYMENT" &&
-                  !selectedOrder.designerId ? (
-                    <>
-                      <Text strong>Chọn Designer để gán:</Text>
-                      <Select
-                        placeholder="Chọn Designer..."
-                        value={selectedDesignerId}
-                        onChange={setSelectedDesignerId}
-                        style={{ width: "100%", marginTop: 8 }}
-                        allowClear
-                      >
-                        {designers.map((designer) => (
-                          <Option key={designer.id} value={designer.id}>
-                            {designer.fullName}
-                          </Option>
-                        ))}
-                      </Select>
-                    </>
-                  ) : null}
-                </Col>
               </Row>
             </Col>
 
             <Col span={10}>
+              <Title level={5}>Trạng thái đơn hàng</Title>
               <Steps
-                current={statusOrder.indexOf(selectedOrder.status)}
+                current={statusOrder.indexOf(selectedOrder.enumBookOrder)}
                 direction="vertical"
                 size="small"
               >
@@ -504,16 +507,44 @@ function BookOrderMng() {
                     key={status}
                     title={statusLabelMap[status]}
                     status={
-                      status === selectedOrder.status
+                      status === selectedOrder.enumBookOrder
                         ? "process"
                         : statusOrder.indexOf(status) <
-                          statusOrder.indexOf(selectedOrder.status)
+                          statusOrder.indexOf(selectedOrder.enumBookOrder)
                         ? "finish"
                         : "wait"
                     }
                   />
                 ))}
               </Steps>
+
+              {selectedOrder.enumBookOrder === "PAYMENT" &&
+                !selectedOrder.designerId && (
+                  <>
+                    <Title level={5} style={{ marginTop: 24 }}>
+                      Gán Designer
+                    </Title>
+                    <Select
+                      showSearch
+                      style={{ width: "100%" }}
+                      placeholder="Chọn Designer"
+                      optionFilterProp="children"
+                      value={selectedDesignerId}
+                      onChange={(value) => setSelectedDesignerId(value)}
+                      filterOption={(input, option) =>
+                        (option?.children ?? "")
+                          .toLowerCase()
+                          .includes(input.toLowerCase())
+                      }
+                    >
+                      {designers.map((designer) => (
+                        <Option key={designer.id} value={designer.id}>
+                          {designer.fullName}
+                        </Option>
+                      ))}
+                    </Select>
+                  </>
+                )}
             </Col>
           </Row>
         ) : (
@@ -525,21 +556,24 @@ function BookOrderMng() {
       <Modal
         title={`Hủy đơn hàng #${selectedOrder?.id || ""}`}
         open={cancelModalOpen}
-        onCancel={() => setCancelModalOpen(false)}
+        onCancel={() => {
+          setCancelModalOpen(false);
+          setCancelReason("");
+        }}
         onOk={handleCancelOrder}
         okText="Xác nhận hủy"
-        okButtonProps={{ danger: true, loading }}
-        width={500}
+        cancelText="Hủy"
+        okButtonProps={{ danger: true }}
+        confirmLoading={loading}
       >
         <Text>Vui lòng nhập lý do hủy đơn hàng:</Text>
         <Input.TextArea
           rows={4}
           value={cancelReason}
           onChange={(e) => setCancelReason(e.target.value)}
-          placeholder="Lý do hủy đơn..."
-          maxLength={500}
-          allowClear
-          style={{ marginTop: 8 }}
+          placeholder="Nhập lý do..."
+          maxLength={200}
+          showCount
         />
       </Modal>
     </div>

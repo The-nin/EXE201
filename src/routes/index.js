@@ -12,6 +12,7 @@ const ROUTES = {
     PROFILE_PAGE: "profile",
     ORDER_COMPLETE: "order-complete",
     ORDER_HISTORY_PAGE: "order-history",
+    SUCCESS_PAGE: "success",
     ADMIN: {
         LOGIN: "login",
         DASHBOARD: "dashboard",
@@ -33,6 +34,7 @@ const ROUTES = {
         ADD_TYPE_PRINT: "add-type-print",
         //
         ORDER: "order",
+        DESIGNER: "designer",
     },
     AUTH: {
         LOGIN: "login",

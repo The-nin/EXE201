@@ -307,6 +307,44 @@ export default function Cart() {
 
   const validateAddress = () => {
     return !!shippingAddress.addressId && !!shippingAddress.paymentMethod;
+    const required = [
+      "fullName",
+      "phone",
+      "address",
+      "ward",
+      "district",
+      "city",
+    ];
+    return required.every((field) => shippingAddress[field].trim() !== "");
+  };
+
+  const handleCheckout = () => {
+    if (cartItems.length === 0) {
+      alert("Giỏ hàng trống!");
+      return;
+    }
+
+    // const outOfStockItems = cartItems.filter((item) => !item.inStock);
+    // if (outOfStockItems.length > 0) {
+    //   alert("Có sản phẩm hết hàng trong giỏ hàng. Vui lòng xóa hoặc thay thế!");
+    //   return;
+    // }
+
+    if (!validateAddress()) {
+      alert("Vui lòng điền đầy đủ thông tin địa chỉ nhận hàng!");
+      return;
+    }
+
+    // Navigate to checkout page
+    navigate("/checkout", {
+      state: {
+        cartItems,
+        shippingAddress,
+        subtotal: calculateSubtotal(),
+        shipping: calculateShipping(),
+        total: calculateTotal(),
+      },
+    });
   };
 
   if (loading) {

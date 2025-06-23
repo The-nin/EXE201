@@ -23,8 +23,6 @@ function RegisterPage() {
     email: "",
     gender: "",
     fullName: "",
-    status: "ACTIVE",
-    role: "CUSTOMER",
   });
 
   const [loading, setLoading] = useState(false);
@@ -54,8 +52,9 @@ function RegisterPage() {
 
     try {
       const response = await register(payload);
+      console.log(response);
       if (response.data.code === 201) {
-        navigate("/login");
+        navigate("/auth/login");
       } else {
         setError("Đăng ký thất bại. Vui lòng thử lại.");
       }

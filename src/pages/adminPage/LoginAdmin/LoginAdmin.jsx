@@ -55,7 +55,8 @@ const LoginAdmin = () => {
           navigate("/admin"); // Admin goes to dashboard
         } else if (
           response.data.result.role === "STAFF" ||
-          response.data.result.role === "MANAGER"
+          response.data.result.role === "MANAGER" ||
+          response.data.result.role === "DESIGNER"
         ) {
           navigate("/admin"); // Other roles go to product management
         } else {

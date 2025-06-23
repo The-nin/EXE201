@@ -3,6 +3,7 @@ import ROUTES from "../index";
 import MainPage from "../../pages/adminPage/MainPage/MainPage";
 import { ProtectedAdminRoute } from "../protectedRoute/ProtectedAdminRoute";
 import BookOrderMng from "../../pages/adminPage/BookOrderMngPage/BookOrderMng";
+import Designer from "../../pages/adminPage/Designer/Designer";
 const LoginAdmin = lazy(() =>
   import("../../pages/adminPage/LoginAdmin/LoginAdmin")
 );
@@ -118,7 +119,16 @@ const adminRoute = [
             element: <AddTypePrintPage />,
           },
         ],
-      }
+      },
+      {
+        path: ROUTES.ADMIN.DESIGNER,
+        children: [
+          {
+            path: "",
+            element: <Designer />,
+          },
+        ],
+      },
     ],
   },
 ];
