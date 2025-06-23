@@ -29,8 +29,9 @@ const Sidebar = ({ collapsed }) => {
     "/admin/product": ["ADMIN", "MANAGER", "STAFF"],
     "/admin/category": ["ADMIN", "MANAGER"],
     "/admin/fabric": ["ADMIN", "MANAGER"],
-    "/admin/bookOrder": ["ADMIN", "MANAGER", "STAFF"],
+    "/admin/bookOrder": ["ADMIN", "MANAGER", "STAFF", "DESIGNER"],
     "/admin/type-print": ["ADMIN", "MANAGER"],
+    "/admin/desiger": ["DESIGNER", "MANAGER", "ADMIN"],
     // "/admin/order": ["ADMIN", "MANAGER", "STAFF", "DELIVERY"],
     // "/admin/blog": ["ADMIN", "MANAGER", "EXPERT"],
     // "/admin/quiz": ["ADMIN", "MANAGER", "EXPERT"],
@@ -81,7 +82,12 @@ const Sidebar = ({ collapsed }) => {
       key: "/admin/type-print",
       icon: <PrinterOutlined />,
       label: "Quản lý loại in",
-    }
+    },
+    {
+      key: "/admin/designer",
+      icon: <DecompressionStream />,
+      label: "Quản lý mẫu thiết kế",
+    },
   ];
 
   const filteredMenuItems = menuItems.filter((item) =>

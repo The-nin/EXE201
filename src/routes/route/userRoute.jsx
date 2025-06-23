@@ -2,6 +2,7 @@ import { lazy } from "react";
 import ROUTES from "../index";
 import CustomShirtOrder from "../../pages/customOrderPage/CustomShirtOrder";
 import ProductDetail from "../../pages/productPage/ProductDetail";
+import Success from "../../pages/adminPage/BookOrderMngPage/success";
 const LandingPage = lazy(() => import("../../pages/landingPage/index"));
 const AboutUsPage = lazy(() => import("../../pages/aboutUsPage/AboutUsPage"));
 const ProductPage = lazy(() => import("../../pages/productPage/product"));
@@ -39,8 +40,8 @@ const userRoutes = [
     element: <ProfilePage />,
   },
   {
-    path: ROUTES.CART_PAGE,
-    element: <CartPage />,
+    path: ROUTES.SUCCESS_PAGE,
+    element: <Success />,
   },
 ];
 

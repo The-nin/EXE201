@@ -5,7 +5,7 @@ import {
   getAllTypePrint,
   getAddressByUser,
 } from "../../service/admin";
-import { bookOrder } from "../../service/user";
+import { bookOrder, paymentBookOrder } from "../../service/user";
 
 function CustomShirtForm() {
   const [formData, setFormData] = useState({
@@ -26,6 +26,8 @@ function CustomShirtForm() {
   const [typePrints, setTypePrints] = useState([]);
   const [error, setError] = useState("");
   const [isApiLoading, setIsApiLoading] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [newOrderId, setNewOrderId] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -40,16 +42,13 @@ function CustomShirtForm() {
         setTypePrints(printRes || []);
 
         const addressRes = await getAddressByUser();
-        let addressData = [];
-        if (Array.isArray(addressRes)) addressData = addressRes;
-        else if (addressRes?.result && Array.isArray(addressRes.result))
-          addressData = addressRes.result;
-        else if (addressRes?.data && Array.isArray(addressRes.data))
-          addressData = addressRes.data;
+        const data = Array.isArray(addressRes)
+          ? addressRes
+          : addressRes?.result || addressRes?.data || [];
 
-        setAddress(addressData);
+        setAddress(data);
 
-        const defaultAddress = addressData.find((addr) => addr.isDefault);
+        const defaultAddress = data.find((addr) => addr.isDefault);
         if (defaultAddress) {
           setFormData((prev) => ({ ...prev, addressId: defaultAddress.id }));
         }
@@ -98,27 +97,52 @@ function CustomShirtForm() {
       };
 
       const response = await bookOrder(payload);
+
       if (response.code === 201) {
-        alert("Đặt hàng thành công!");
-        setFormData({
-          size: "S",
-          quantity: 1,
-          description: "",
-          color: "#ffffff",
-          categoryId: "",
-          fabricId: "",
-          image: [],
-          typePrintId: "",
-          addressId: "",
-        });
+        setNewOrderId(response.result.id);
+        // setNewOrderId(6);
+        console.log(response.result.id);
+        console.log(newOrderId);
+        setShowPaymentModal(true);
+        console.log(newOrderId);
       } else {
-        setError(response?.data?.message || "Đặt hàng thất bại.");
+        setError(response?.message || "Đặt hàng thất bại.");
       }
     } catch (err) {
-      setError(err.response?.data?.message || "Lỗi không xác định");
+      setError(err.response?.message || "Lỗi không xác định");
     } finally {
       setIsApiLoading(false);
     }
+  };
+
+  const handlePaymentConfirm = async () => {
+    if (!newOrderId) return;
+
+    setShowPaymentModal(false);
+
+    try {
+      const paymentRes = await paymentBookOrder(10, 2000);
+
+      if (paymentRes?.code === 200 || paymentRes?.status === 200) {
+        alert("Thanh toán thành công!");
+
+        const checkoutUrl = paymentRes?.result?.checkoutUrl;
+
+        if (checkoutUrl) {
+          window.location.href = checkoutUrl;
+        } else {
+          console.warn("Không có checkoutUrl trong phản hồi");
+          alert("Không tìm thấy link thanh toán.");
+        }
+      } else {
+        alert("Thanh toán thất bại.");
+      }
+    } catch (err) {
+      console.error("Lỗi khi thanh toán:", err);
+      alert("Đã xảy ra lỗi khi thanh toán.");
+    }
+
+    setNewOrderId(null);
   };
 
   return (
@@ -225,7 +249,6 @@ function CustomShirtForm() {
                 />
               </div>
 
-              {/* Địa chỉ giao hàng - dùng icon Bootstrap */}
               <div className="col-12">
                 <label className="form-label">Địa chỉ giao hàng</label>
                 {address.length > 0 ? (
@@ -247,21 +270,14 @@ function CustomShirtForm() {
                             required
                           />
                           <div className="w-100">
-                            <div className="mb-1">
-                              <i className="bi bi-person-fill text-primary me-2" />
-                              <strong>{addr.name}</strong>
-                              {addr.isDefault && (
-                                <span className="badge bg-success ms-2">
-                                  Mặc định
-                                </span>
-                              )}
-                            </div>
-                            <div className="mb-1">
-                              <i className="bi bi-telephone-fill text-secondary me-2" />
-                              {addr.phone}
-                            </div>
+                            <strong>{addr.name}</strong>
+                            {addr.isDefault && (
+                              <span className="badge bg-success ms-2">
+                                Mặc định
+                              </span>
+                            )}
+                            <div>{addr.phone}</div>
                             <div>
-                              <i className="bi bi-geo-alt-fill text-danger me-2" />
                               {addr.addressLine}, {addr.ward}, {addr.district},{" "}
                               {addr.city}
                             </div>
@@ -272,9 +288,7 @@ function CustomShirtForm() {
                   </div>
                 ) : (
                   <div className="form-text text-muted mt-1">
-                    <small>
-                      Không thể tải danh sách địa chỉ. Vui lòng thử lại sau.
-                    </small>
+                    Không thể tải danh sách địa chỉ. Vui lòng thử lại sau.
                   </div>
                 )}
               </div>
@@ -329,6 +343,48 @@ function CustomShirtForm() {
           </form>
         </div>
       </div>
+
+      {/* Modal xác nhận thanh toán */}
+      {showPaymentModal && (
+        <div
+          className="modal fade show"
+          style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
+          tabIndex={-1}
+          role="dialog"
+        >
+          <div className="modal-dialog" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Xác nhận thanh toán</h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setShowPaymentModal(false)}
+                />
+              </div>
+              <div className="modal-body">
+                <p>Bạn có muốn thanh toán đơn hàng ngay bây giờ không?</p>
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setShowPaymentModal(false)}
+                >
+                  Đóng
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-success"
+                  onClick={handlePaymentConfirm}
+                >
+                  Thanh toán ngay
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

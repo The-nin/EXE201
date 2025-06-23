@@ -226,7 +226,12 @@ function BookOrderMng() {
       title: "Địa chỉ",
       dataIndex: "address",
       key: "address",
-      render: (address) => address || "--",
+      render: (address) =>
+        address
+          ? `${address?.street || "--"},${address?.ward || "--"} ,${
+              address?.city || "--"
+            }`
+          : "--",
       width: 200,
     },
     {
@@ -370,25 +375,13 @@ function BookOrderMng() {
                 <Col span={14}>{selectedOrder.user?.phone || "--"}</Col>
 
                 <Col span={10}>
-                  <Text strong>Địa chỉ giao hàng:</Text>
-                </Col>
-                <Col span={14}>{selectedOrder.address || "--"}</Col>
-
-                <Col span={10}>
-                  <Text strong>ID Địa chỉ:</Text>
-                </Col>
-                <Col span={14}>{selectedOrder.address_id || "--"}</Col>
-
-                <Col span={10}>
                   <Text strong>Chi tiết địa chỉ:</Text>
                 </Col>
                 <Col span={14}>
-                  {addressLoading
-                    ? "Đang tải..."
-                    : addressDetails
-                    ? `${addressDetails.street || ""}, ${
-                        addressDetails.city || ""
-                      }`
+                  {selectedOrder
+                    ? `${selectedOrder.address?.street || ""}, ${
+                        selectedOrder.address?.ward || ""
+                      }, ${selectedOrder.address?.district || ""}`
                     : "--"}
                 </Col>
 

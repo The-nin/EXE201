@@ -159,6 +159,15 @@ export const getAddressId = async (id) => {
     }
 }
 
+export const paymentSuccess = async (id) => {
+    try{
+        const response = await instance.patch(`/api/bookOrder/${id}/`, null, authHeader);
+        return response.data;
+    }catch(error){
+        console.log("error", error);
+    }
+}
+
 export { 
     getAllAccount, 
     getAllCategory, createCategory, 
