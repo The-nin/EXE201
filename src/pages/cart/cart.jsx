@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -22,47 +24,29 @@ import {
   FiTruck,
   FiUser,
   FiPhone,
-  FiPlusCircle,
 } from "react-icons/fi";
-import {
-  createOrder,
-  deleteCart,
-  getCart,
-  updateCart,
-} from "../../service/user";
-import { getAddressByUser } from "../../service/admin";
+import { deleteCart, getCart, updateCart } from "../../service/user";
 import { toast } from "react-toastify";
-import { instance } from "../../service/instance";
 
 export default function Cart() {
   const navigate = useNavigate();
 
   const [cart, setCart] = useState([]);
   const [cartItems, setCartItems] = useState([]);
-  const [addressList, setAddressList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [itemToRemove, setItemToRemove] = useState(null);
-  const [showAddAddressModal, setShowAddAddressModal] = useState(false);
-  const [newAddress, setNewAddress] = useState({
-    name: "",
-    phone: "",
-    district: "",
-    ward: "",
-    street: "",
-    addressLine: "",
-    isDefault: false,
-  });
 
+  // Shipping address state
   const [shippingAddress, setShippingAddress] = useState({
-    addressId: "",
     fullName: "",
     phone: "",
-    addressLine: "",
+    email: "",
+    address: "",
     ward: "",
     district: "",
     city: "",
-    paymentMethod: "",
+    note: "",
   });
 
   const fetchCart = async () => {
@@ -78,99 +62,8 @@ export default function Cart() {
     }
   };
 
-  const fetchAddress = async () => {
-    setLoading(true);
-    try {
-      const addressRes = await getAddressByUser();
-      let addressData = [];
-      if (Array.isArray(addressRes)) addressData = addressRes;
-      else if (addressRes?.result && Array.isArray(addressRes.result))
-        addressData = addressRes.result;
-      else if (addressRes?.data && Array.isArray(addressRes.data))
-        addressData = addressRes.data;
-
-      setAddressList(addressData);
-
-      const defaultAddress = addressData.find((addr) => addr.isDefault);
-      if (defaultAddress) {
-        setShippingAddress({
-          addressId: defaultAddress.id,
-          fullName: defaultAddress.name,
-          phone: defaultAddress.phone,
-          addressLine: defaultAddress.addressLine,
-          ward: defaultAddress.ward,
-          district: defaultAddress.district,
-          city: defaultAddress.city,
-          paymentMethod: "",
-        });
-      }
-    } catch (error) {
-      console.error("Lỗi khi tải địa chỉ:", error);
-      setAddressList([]);
-      toast.error("Không thể tải danh sách địa chỉ.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const createNewAddress = async () => {
-    setLoading(true);
-
-    const token = localStorage.getItem("token");
-
-    try {
-      const response = await instance.post("/api/addresses", newAddress, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-      const data = response.data;
-      console.log("Response data:", data); // Kiểm tra response
-
-      if (data.code === 201 && data.message === "Thêm mới địa chỉ thành công") {
-        toast.success("Thêm địa chỉ thành công!");
-        // Làm mới danh sách địa chỉ từ server
-        await fetchAddress();
-      } else {
-        toast.error(
-          "Thêm địa chỉ thất bại: " +
-            (data.message || "Không nhận được phản hồi hợp lệ")
-        );
-      }
-    } catch (error) {
-      console.error(
-        "Lỗi khi tạo địa chỉ:",
-        error.response ? error.response.data : error.message
-      );
-      if (error.response && error.response.status === 404) {
-        toast.error(
-          "Endpoint /api/addresses không tồn tại. Vui lòng kiểm tra server hoặc URL."
-        );
-      } else {
-        toast.error(
-          "Có lỗi xảy ra khi tạo địa chỉ: " +
-            (error.response?.data?.message || error.message)
-        );
-      }
-    } finally {
-      setShowAddAddressModal(false); // Đảm bảo modal tắt
-      setLoading(false);
-      setNewAddress({
-        name: "",
-        phone: "",
-        district: "",
-        ward: "",
-        street: "",
-        addressLine: "",
-        isDefault: false,
-      });
-    }
-  };
-
   useEffect(() => {
     fetchCart();
-    fetchAddress();
   }, []);
 
   const formatPrice = (price) => {
@@ -206,74 +99,20 @@ export default function Cart() {
     setItemToRemove(item);
     setShowRemoveModal(true);
   };
+  console.log(itemToRemove?.productId);
 
   const confirmRemoveItem = async (productId) => {
+    console.log(productId);
     try {
       const response = await deleteCart(productId);
-      if (response.data.code === 200) {
-        toast.success("Xóa thành công");
-        fetchCart();
-      } else {
-        toast.error(response.data.message || "Xóa thất bại");
-      }
+      console.log(response);
+      // if (response.data.code === 200) {
+      //   toast.success("Xóa thành công");
+      // } else {
+      //   toast.error(response.message);
+      // }
     } catch (err) {
       console.error("Có lỗi trong việc xóa:", err);
-      toast.error("Có lỗi trong việc xóa sản phẩm");
-    } finally {
-      setShowRemoveModal(false);
-    }
-  };
-
-  const handleAddressSelect = (addr) => {
-    setShippingAddress({
-      addressId: addr.id,
-      fullName: addr.name,
-      phone: addr.phone,
-      addressLine: addr.addressLine,
-      ward: addr.ward,
-      district: addr.district,
-      city: addr.city,
-      paymentMethod: shippingAddress.paymentMethod,
-    });
-  };
-
-  const handleNewAddressChange = (field, value) => {
-    setNewAddress((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-
-  const handleCheckout = async () => {
-    if (!cartItems || cartItems.length === 0) {
-      toast.warning("Giỏ hàng trống!");
-      return;
-    }
-
-    if (!validateAddress()) {
-      toast.warning(
-        "Vui lòng chọn địa chỉ giao hàng và phương thức thanh toán!"
-      );
-      return;
-    }
-
-    try {
-      const response = await createOrder({
-        cartId: cart?.cartId,
-        addressId: shippingAddress.addressId,
-        paymentMethod: shippingAddress.paymentMethod,
-      });
-
-      if (response?.data?.code === 200) {
-        toast.success("Đặt hàng thành công!");
-        const orderId = response.data.result.orderId;
-        navigate("/order-complete", { state: { orderId } });
-      } else {
-        toast.error(response?.data?.message || "Đặt hàng thất bại");
-      }
-    } catch (error) {
-      console.error("Lỗi khi đặt hàng:", error);
-      toast.error("Có lỗi xảy ra khi tạo đơn hàng!");
     }
   };
 
@@ -297,16 +136,18 @@ export default function Cart() {
 
   const calculateShipping = () => {
     const subtotal = calculateSubtotal();
-    if (subtotal >= 500000) return 0;
+    if (subtotal >= 500000) return 0; // Free shipping for orders over 500k
     return 30000;
   };
 
   const calculateTotal = () => {
-    return calculateSubtotal() + calculateShipping();
+    const subtotal = calculateSubtotal();
+    const shipping = calculateShipping();
+    return subtotal + shipping;
   };
 
   const validateAddress = () => {
-    return !!shippingAddress.addressId && !!shippingAddress.paymentMethod;
+    //return !!shippingAddress.addressId && !!shippingAddress.paymentMethod;
     const required = [
       "fullName",
       "phone",
@@ -361,6 +202,7 @@ export default function Cart() {
 
   return (
     <Container className="py-4">
+      {/* Header */}
       <Row className="mb-4">
         <Col>
           <div className="d-flex align-items-center justify-content-between">
@@ -389,6 +231,7 @@ export default function Cart() {
       </Row>
 
       {cartItems.length === 0 ? (
+        /* Empty Cart */
         <Row>
           <Col>
             <Card className="text-center py-5">
@@ -411,6 +254,7 @@ export default function Cart() {
         </Row>
       ) : (
         <Row>
+          {/* Cart Items */}
           <Col lg={8}>
             <Card>
               <Card.Header>
@@ -429,7 +273,10 @@ export default function Cart() {
                   </thead>
                   <tbody>
                     {cartItems.map((item) => (
-                      <tr key={item.productId}>
+                      <tr
+                        key={item.productId}
+                        // className={!item.inStock ? "table-warning" : ""}
+                      >
                         <td>
                           <div className="d-flex align-items-center">
                             <img
@@ -447,6 +294,11 @@ export default function Cart() {
                               <div className="text-muted small">
                                 <div>Màu: {item?.color}</div>
                                 <div>Size: {item?.size}</div>
+                                {/* {!item.inStock && (
+                                  <Badge bg="warning" text="dark">
+                                    Hết hàng
+                                  </Badge>
+                                )} */}
                               </div>
                             </div>
                           </div>
@@ -484,6 +336,7 @@ export default function Cart() {
                                   item.quantity + 1
                                 )
                               }
+                              // disabled={cartItems.quantity >= cartItems.stock}
                             >
                               <FiPlus />
                             </Button>
@@ -524,85 +377,155 @@ export default function Cart() {
                 </h6>
               </Card.Header>
               <Card.Body>
-                {addressList.length > 0 ? (
-                  <div className="mb-3">
-                    <Form.Label>Chọn địa chỉ giao hàng</Form.Label>
-                    <div className="list-group">
-                      {addressList.map((addr) => (
-                        <label
-                          key={addr.id}
-                          className="list-group-item border rounded p-3 mb-2"
-                          style={{ cursor: "pointer" }}
-                        >
-                          <div className="d-flex align-items-start">
-                            <Form.Check
-                              type="radio"
-                              name="addressId"
-                              value={addr.id}
-                              checked={shippingAddress.addressId === addr.id}
-                              onChange={() => handleAddressSelect(addr)}
-                              className="me-3 mt-1"
-                              required
-                            />
-                            <div className="w-100">
-                              <div className="mb-1">
-                                <FiUser className="text-primary me-2" />
-                                <strong>{addr.name}</strong>
-                                {addr.isDefault && (
-                                  <Badge bg="success" className="ms-2">
-                                    Mặc định
-                                  </Badge>
-                                )}
-                              </div>
-                              <div className="mb-1">
-                                <FiPhone className="text-secondary me-2" />
-                                {addr.phone}
-                              </div>
-                              <div>
-                                <FiMapPin className="text-danger me-2" />
-                                {addr.addressLine}, {addr.ward}, {addr.district}
-                                , {addr.city}
-                              </div>
-                            </div>
-                          </div>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-muted mb-3">
-                    Không có địa chỉ nào được lưu.
-                  </div>
-                )}
-                <Button
-                  variant="outline-primary"
-                  onClick={() => setShowAddAddressModal(true)}
-                  className="mb-3"
-                >
-                  <FiPlusCircle className="me-2" />
-                  Thêm địa chỉ mới
-                </Button>
+                <Row>
+                  <Col md={6}>
+                    <Form.Group className="mb-3">
+                      <Form.Label>
+                        <FiUser className="me-1" />
+                        Họ và tên <span className="text-danger">*</span>
+                      </Form.Label>
+                      <Form.Control
+                        type="text"
+                        placeholder="Nhập họ và tên"
+                        value={shippingAddress.fullName}
+                        onChange={(e) =>
+                          handleAddressChange("fullName", e.target.value)
+                        }
+                        required
+                      />
+                    </Form.Group>
+                  </Col>
+                  <Col md={6}>
+                    <Form.Group className="mb-3">
+                      <Form.Label>
+                        <FiPhone className="me-1" />
+                        Số điện thoại <span className="text-danger">*</span>
+                      </Form.Label>
+                      <Form.Control
+                        type="tel"
+                        placeholder="Nhập số điện thoại"
+                        value={shippingAddress.phone}
+                        onChange={(e) =>
+                          handleAddressChange("phone", e.target.value)
+                        }
+                        required
+                      />
+                    </Form.Group>
+                  </Col>
+                </Row>
+
+                <Form.Group className="mb-3">
+                  <Form.Label>Email (tùy chọn)</Form.Label>
+                  <Form.Control
+                    type="email"
+                    placeholder="Nhập email để nhận thông báo đơn hàng"
+                    value={shippingAddress.email}
+                    onChange={(e) =>
+                      handleAddressChange("email", e.target.value)
+                    }
+                  />
+                </Form.Group>
+
                 <Form.Group className="mb-3">
                   <Form.Label>
-                    Phương thức thanh toán{" "}
-                    <span className="text-danger">*</span>
+                    Địa chỉ cụ thể <span className="text-danger">*</span>
                   </Form.Label>
-                  <Form.Select
-                    value={shippingAddress.paymentMethod}
+                  <Form.Control
+                    type="text"
+                    placeholder="Số nhà, tên đường"
+                    value={shippingAddress.address}
                     onChange={(e) =>
-                      handleAddressChange("paymentMethod", e.target.value)
+                      handleAddressChange("address", e.target.value)
                     }
                     required
-                  >
-                    <option value="">Chọn phương thức thanh toán</option>
-                    <option value="COD">COD</option>
-                    <option value="VNPAY">VNPAY</option>
-                  </Form.Select>
+                  />
+                </Form.Group>
+
+                <Row>
+                  <Col md={4}>
+                    <Form.Group className="mb-3">
+                      <Form.Label>
+                        Phường/Xã <span className="text-danger">*</span>
+                      </Form.Label>
+                      <Form.Select
+                        value={shippingAddress.ward}
+                        onChange={(e) =>
+                          handleAddressChange("ward", e.target.value)
+                        }
+                        required
+                      >
+                        <option value="">Chọn phường/xã</option>
+                        <option value="Phường 1">Phường 1</option>
+                        <option value="Phường 2">Phường 2</option>
+                        <option value="Phường 3">Phường 3</option>
+                        <option value="Phường Bến Nghé">Phường Bến Nghé</option>
+                        <option value="Phường Bến Thành">
+                          Phường Bến Thành
+                        </option>
+                      </Form.Select>
+                    </Form.Group>
+                  </Col>
+                  <Col md={4}>
+                    <Form.Group className="mb-3">
+                      <Form.Label>
+                        Quận/Huyện <span className="text-danger">*</span>
+                      </Form.Label>
+                      <Form.Select
+                        value={shippingAddress.district}
+                        onChange={(e) =>
+                          handleAddressChange("district", e.target.value)
+                        }
+                        required
+                      >
+                        <option value="">Chọn quận/huyện</option>
+                        <option value="Quận 1">Quận 1</option>
+                        <option value="Quận 2">Quận 2</option>
+                        <option value="Quận 3">Quận 3</option>
+                        <option value="Quận Bình Thạnh">Quận Bình Thạnh</option>
+                        <option value="Quận Tân Bình">Quận Tân Bình</option>
+                      </Form.Select>
+                    </Form.Group>
+                  </Col>
+                  <Col md={4}>
+                    <Form.Group className="mb-3">
+                      <Form.Label>
+                        Tỉnh/Thành phố <span className="text-danger">*</span>
+                      </Form.Label>
+                      <Form.Select
+                        value={shippingAddress.city}
+                        onChange={(e) =>
+                          handleAddressChange("city", e.target.value)
+                        }
+                        required
+                      >
+                        <option value="">Chọn tỉnh/thành</option>
+                        <option value="TP. Hồ Chí Minh">TP. Hồ Chí Minh</option>
+                        <option value="Hà Nội">Hà Nội</option>
+                        <option value="Đà Nẵng">Đà Nẵng</option>
+                        <option value="Cần Thơ">Cần Thơ</option>
+                        <option value="Hải Phòng">Hải Phòng</option>
+                      </Form.Select>
+                    </Form.Group>
+                  </Col>
+                </Row>
+
+                <Form.Group className="mb-0">
+                  <Form.Label>Ghi chú (tùy chọn)</Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={3}
+                    placeholder="Ghi chú thêm cho đơn hàng (thời gian giao hàng, yêu cầu đặc biệt...)"
+                    value={shippingAddress.note}
+                    onChange={(e) =>
+                      handleAddressChange("note", e.target.value)
+                    }
+                  />
                 </Form.Group>
               </Card.Body>
             </Card>
           </Col>
 
+          {/* Order Summary */}
           <Col lg={4}>
             <Card className="sticky-top" style={{ top: "20px" }}>
               <Card.Header>
@@ -613,6 +536,7 @@ export default function Cart() {
                   <span>Tạm tính:</span>
                   <span>{formatPrice(calculateSubtotal())}</span>
                 </div>
+
                 <div className="d-flex justify-content-between mb-2">
                   <span>
                     <FiTruck className="me-1" />
@@ -626,13 +550,16 @@ export default function Cart() {
                     )}
                   </span>
                 </div>
+
                 <hr />
+
                 <div className="d-flex justify-content-between mb-3">
                   <strong>Tổng cộng:</strong>
                   <strong className="text-danger fs-5">
                     {formatPrice(calculateTotal())}
                   </strong>
                 </div>
+
                 <Button
                   variant="primary"
                   size="lg"
@@ -643,12 +570,15 @@ export default function Cart() {
                   <FiCreditCard className="me-2" />
                   Đặt hàng
                 </Button>
+
                 <div className="text-center">
                   <small className="text-muted">
                     <FiTruck className="me-1" />
                     Miễn phí vận chuyển cho đơn hàng từ {formatPrice(500000)}
                   </small>
                 </div>
+
+                {/* Address Summary */}
                 {validateAddress() && (
                   <div className="mt-3 p-3 bg-light rounded">
                     <h6 className="mb-2">
@@ -659,14 +589,21 @@ export default function Cart() {
                       <div className="fw-bold">{shippingAddress.fullName}</div>
                       <div>{shippingAddress.phone}</div>
                       <div>
-                        {shippingAddress.addressLine}, {shippingAddress.ward},{" "}
+                        {shippingAddress.address}, {shippingAddress.ward},{" "}
                         {shippingAddress.district}, {shippingAddress.city}
                       </div>
+                      {shippingAddress.note && (
+                        <div className="text-muted mt-1">
+                          <em>Ghi chú: {shippingAddress.note}</em>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
               </Card.Body>
             </Card>
+
+            {/* Shipping Info */}
             <Card className="mt-3">
               <Card.Body className="p-3">
                 <h6 className="mb-2">
@@ -702,126 +639,6 @@ export default function Cart() {
           >
             <FiTrash2 className="me-2" />
             Xóa sản phẩm
-          </Button>
-        </Modal.Footer>
-      </Modal>
-
-      {/* Add New Address Modal */}
-      <Modal
-        show={showAddAddressModal}
-        onHide={() => setShowAddAddressModal(false)}
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Thêm địa chỉ mới</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
-            <Form.Group className="mb-3">
-              <Form.Label>
-                Họ và tên <span className="text-danger">*</span>
-              </Form.Label>
-              <Form.Control
-                type="text"
-                value={newAddress.name}
-                onChange={(e) => handleNewAddressChange("name", e.target.value)}
-                required
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>
-                Số điện thoại <span className="text-danger">*</span>
-              </Form.Label>
-              <Form.Control
-                type="tel"
-                value={newAddress.phone}
-                onChange={(e) =>
-                  handleNewAddressChange("phone", e.target.value)
-                }
-                required
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>
-                Tỉnh/Tp <span className="text-danger">*</span>
-              </Form.Label>
-              <Form.Control
-                type="text"
-                value={newAddress.city}
-                onChange={(e) => handleNewAddressChange("city", e.target.value)}
-                required
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>
-                Quận/Huyện <span className="text-danger">*</span>
-              </Form.Label>
-              <Form.Control
-                type="text"
-                value={newAddress.district}
-                onChange={(e) =>
-                  handleNewAddressChange("district", e.target.value)
-                }
-                required
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>
-                Phường/Xã <span className="text-danger">*</span>
-              </Form.Label>
-              <Form.Control
-                type="text"
-                value={newAddress.ward}
-                onChange={(e) => handleNewAddressChange("ward", e.target.value)}
-                required
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>
-                Đường/Phố <span className="text-danger">*</span>
-              </Form.Label>
-              <Form.Control
-                type="text"
-                value={newAddress.street}
-                onChange={(e) =>
-                  handleNewAddressChange("street", e.target.value)
-                }
-                required
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>
-                Địa chỉ chi tiết <span className="text-danger">*</span>
-              </Form.Label>
-              <Form.Control
-                type="text"
-                value={newAddress.addressLine}
-                onChange={(e) =>
-                  handleNewAddressChange("addressLine", e.target.value)
-                }
-                required
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Check
-                type="checkbox"
-                label="Đặt làm địa chỉ mặc định"
-                checked={newAddress.isDefault}
-                onChange={(e) =>
-                  handleNewAddressChange("isDefault", e.target.checked)
-                }
-              />
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            variant="secondary"
-            onClick={() => setShowAddAddressModal(false)}
-          >
-            Hủy
-          </Button>
-          <Button variant="primary" onClick={createNewAddress}>
-            Thêm địa chỉ
           </Button>
         </Modal.Footer>
       </Modal>

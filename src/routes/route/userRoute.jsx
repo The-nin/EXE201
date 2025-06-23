@@ -10,7 +10,6 @@ const ProductPage = lazy(() => import("../../pages/productPage/product"));
 const ContactPage = lazy(() => import("../../pages/contactPage/contact"));
 const ProfilePage = lazy(() => import("../../pages/profilePage/ProfilePage"));
 const CartPage = lazy(() => import("../../pages/cart/cart"));
-const OrderCompletePage = lazy(() => import("../../pages/cart/orderComplete"));
 
 const userRoutes = [
   {
@@ -44,14 +43,6 @@ const userRoutes = [
   {
     path: ROUTES.SUCCESS_PAGE,
     element: <Success />,
-  },
-  {
-    path: ROUTES.ORDER_COMPLETE,
-    element: <OrderCompletePage />,
-  },
-  {
-    path: ROUTES.ORDER_HISTORY_PAGE,
-    element: <OrderHistory />,
   },
 ];
 

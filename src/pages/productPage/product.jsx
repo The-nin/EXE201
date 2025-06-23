@@ -13,6 +13,7 @@ export default function Product() {
       setLoading(true);
       try {
         const res = await getAllProduct();
+        console.log(res);
         setProducts(res);
       } catch (error) {
         console.error("Lỗi khi gọi API:", error);
