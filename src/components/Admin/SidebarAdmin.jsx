@@ -31,7 +31,7 @@ const Sidebar = ({ collapsed }) => {
     "/admin/fabric": ["ADMIN", "MANAGER"],
     "/admin/bookOrder": ["ADMIN", "MANAGER", "STAFF"],
     "/admin/type-print": ["ADMIN", "MANAGER"],
-    // "/admin/order": ["ADMIN", "MANAGER", "STAFF", "DELIVERY"],
+    "/admin/order": ["ADMIN", "MANAGER", "STAFF", "DELIVERY"],
     // "/admin/blog": ["ADMIN", "MANAGER", "EXPERT"],
     // "/admin/quiz": ["ADMIN", "MANAGER", "EXPERT"],
     // "/admin/voucher": ["ADMIN", "MANAGER"],
@@ -75,13 +75,13 @@ const Sidebar = ({ collapsed }) => {
     {
       key: "/admin/bookOrder",
       icon: <ReadOutlined />,
-      label: "Quản lý đơn hàng",
+      label: "Quản lý đặt hàng",
     },
     {
       key: "/admin/type-print",
       icon: <PrinterOutlined />,
       label: "Quản lý loại in",
-    }
+    },
   ];
 
   const filteredMenuItems = menuItems.filter((item) =>

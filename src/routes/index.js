@@ -10,6 +10,8 @@ const ROUTES = {
     CONTACT_PAGE: "contact",
     CUSTOM_SHIRT_PAGE: "custom-shirt",
     PROFILE_PAGE: "profile",
+    ORDER_COMPLETE: "order-complete",
+    ORDER_HISTORY_PAGE: "order-history",
     ADMIN: {
         LOGIN: "login",
         DASHBOARD: "dashboard",
@@ -29,6 +31,8 @@ const ROUTES = {
         //
         TYPE_PRINT_MNG: "type-print",
         ADD_TYPE_PRINT: "add-type-print",
+        //
+        ORDER: "order",
     },
     AUTH: {
         LOGIN: "login",

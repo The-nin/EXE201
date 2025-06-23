@@ -25,6 +25,7 @@ import {
 import { addToCart, getProductDetail } from "../../service/user";
 import { useNavigate, useParams } from "react-router-dom";
 import { all } from "axios";
+import { toast, ToastContainer } from "react-toastify";
 
 const mockProduct = {
   description:
@@ -77,16 +78,20 @@ export default function ProductDetail() {
   const handleAddToCart = async () => {
     const token = localStorage.getItem("token");
     if (!token) {
-      // You might want to handle this case - redirect to login or show login modal
-      // toast.error("Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng");
+      console.log("Chuaw cos token");
       return;
     }
 
     try {
       const response = await addToCart(product.id, quantity, selectedSize.size);
       console.log("Thêm vào giỏ hàng thành công:", response);
+
+      if (response.data.code === 200) {
+        toast.success("Thêm vào giỏ hàng thành công!");
+      }
     } catch (error) {
       console.error("Có lỗi:", error);
+      toast.error("Thêm vào giỏ hàng thất bại!");
     }
   };
 
@@ -140,10 +145,10 @@ export default function ProductDetail() {
   //   ));
   // };
 
-  const colorMap = {
-    Trắng: "#fffff",
-    Đỏ: "#ff0000",
-  };
+  // const colorMap = {
+  //   "Màu trắng": "#fffff",
+  //   Đỏ: "#ff0000",
+  // };
 
   if (loading) {
     return <div>Loading...</div>;
@@ -157,6 +162,17 @@ export default function ProductDetail() {
 
   return (
     <Container className="py-5">
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
       <div className="d-flex align-items-center mb-4">
         <Button
           variant="outline-secondary"
@@ -237,7 +253,7 @@ export default function ProductDetail() {
           </div>
 
           {/* Color */}
-          <div className="mb-4">
+          {/* <div className="mb-4">
             <h5 className="fw-semibold mb-2">Màu sắc:</h5>
             <div className="d-flex align-items-center gap-2">
               <div
@@ -250,6 +266,21 @@ export default function ProductDetail() {
                 }}
               ></div>
               <span className="fw-medium">{product?.color}</span>
+            </div>
+          </div> */}
+          <div className="mb-4">
+            <h5 className="fw-semibold mb-2">Màu sắc:</h5>
+            <div className="d-flex align-items-center gap-2">
+              <div
+                className="rounded-circle border border-2"
+                style={{
+                  width: "30px",
+                  height: "30px",
+                  backgroundColor: "#ffffff", // trắng luôn
+                  borderColor: "#dee2e6",
+                }}
+              ></div>
+              <span className="fw-medium">Màu trắng</span>
             </div>
           </div>
 
@@ -415,7 +446,7 @@ export default function ProductDetail() {
                     <ListGroup.Item className="d-flex justify-content-between py-3">
                       <span className="fw-medium">Chất liệu:</span>
                       <span className="text-muted">
-                        {product?.fabric || " Đang tải"}
+                        {product?.fabric.fabricName || " Đang tải"}
                       </span>
                     </ListGroup.Item>
                     <ListGroup.Item className="d-flex justify-content-between py-3">

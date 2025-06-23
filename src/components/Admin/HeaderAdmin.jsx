@@ -41,6 +41,8 @@ const HeaderAdmin = ({ collapsed, toggleCollapsed, adminUser }) => {
     navigate("/admin/login");
   };
 
+  const userAdminName = localStorage.getItem("fullName");
+
   const dropdownItems = {
     items: [
       {
@@ -82,7 +84,7 @@ const HeaderAdmin = ({ collapsed, toggleCollapsed, adminUser }) => {
               icon={<UserOutlined />}
               style={{ backgroundColor: "#1890ff" }}
             />
-            <span style={{ color: "#000" }}>{adminUser || "Admin"}</span>
+            <span style={{ color: "#000" }}>{adminUser || userAdminName}</span>
           </Space>
         </Dropdown>
       </div>
