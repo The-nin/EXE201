@@ -42,7 +42,7 @@ export default function Header() {
         </Link>
       </Menu.Item>
       <Menu.Item key="2">
-        <Link to="/settings" className={header["dropdown-item"]}>
+        <Link to="/order-history" className={header["dropdown-item"]}>
           Lịch sử đặt hàng
         </Link>
       </Menu.Item>

@@ -24,7 +24,7 @@ import {
 } from "react-icons/fi";
 import { addToCart, getProductDetail } from "../../service/user";
 import { useNavigate, useParams } from "react-router-dom";
-import { all } from "axios";
+import { toast, ToastContainer } from "react-toastify";
 
 const mockProduct = {
   description:
@@ -63,6 +63,7 @@ export default function ProductDetail() {
       setLoading(true);
       try {
         const response = await getProductDetail(id);
+        console.log(response);
         setProduct(response);
       } catch (error) {
         console.log(error);
@@ -84,7 +85,11 @@ export default function ProductDetail() {
 
     try {
       const response = await addToCart(product.id, quantity, selectedSize.size);
-      console.log("Thêm vào giỏ hàng thành công:", response);
+      if (response?.data?.code === 200) {
+        toast.success("Thêm vào giỏ hàng thành công");
+      } else {
+        toast.error("Thêm vào giỏ hàng thất bại");
+      }
     } catch (error) {
       console.error("Có lỗi:", error);
     }
@@ -140,10 +145,10 @@ export default function ProductDetail() {
   //   ));
   // };
 
-  const colorMap = {
-    Trắng: "#fffff",
-    Đỏ: "#ff0000",
-  };
+  // const colorMap = {
+  //   Trắng: "#fffff",
+  //   Đỏ: "#ff0000",
+  // };
 
   if (loading) {
     return <div>Loading...</div>;
@@ -157,6 +162,17 @@ export default function ProductDetail() {
 
   return (
     <Container className="py-5">
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
       <div className="d-flex align-items-center mb-4">
         <Button
           variant="outline-secondary"
@@ -245,11 +261,11 @@ export default function ProductDetail() {
                 style={{
                   width: "30px",
                   height: "30px",
-                  backgroundColor: colorMap,
+                  backgroundColor: "#fff",
                   borderColor: "#dee2e6",
                 }}
               ></div>
-              <span className="fw-medium">{product?.color}</span>
+              <span className="fw-medium">Màu trắng</span>
             </div>
           </div>
 
@@ -415,7 +431,7 @@ export default function ProductDetail() {
                     <ListGroup.Item className="d-flex justify-content-between py-3">
                       <span className="fw-medium">Chất liệu:</span>
                       <span className="text-muted">
-                        {product?.fabric || " Đang tải"}
+                        {product?.fabric?.fabricName || " Đang tải"}
                       </span>
                     </ListGroup.Item>
                     <ListGroup.Item className="d-flex justify-content-between py-3">

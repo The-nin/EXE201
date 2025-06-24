@@ -101,7 +101,7 @@ const deleteCart = async (productIds) => {
 const createOrder = async (cartId , addressId , paymentMethod ) => {
     try {
         const response = await instance.post(
-            `/api/payment?cartId =${cartId }&addressId=${addressId}&paymentMethod=${paymentMethod}`,
+            `/api/payment?cartId=${cartId}&addressId=${addressId}&paymentMethod=${paymentMethod}`,
             {},
             authHeader
         )
@@ -112,5 +112,35 @@ const createOrder = async (cartId , addressId , paymentMethod ) => {
     }
 }
 
+const getOrderHistory = async () => {
+    const token = localStorage.getItem("token");
+    const authHeader = {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }
+    try {
+        const response = await instance.get("/order/history-order", authHeader);
+        return response
+    } catch (error) {
+        console.log(error)
+    }
+}
 
-export { bookOrder, getProductDetail, addToCart, getCart, updateCart, deleteCart, createOrder }
+const getOrderDetail = async (id) => {
+    const token = localStorage.getItem("token");
+    const authHeader = {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }
+    try {
+        const response = await instance.get(`/orders/${id}`, authHeader);
+        return response
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export { bookOrder, getProductDetail, addToCart, getCart, updateCart, deleteCart, createOrder,
+    getOrderDetail, getOrderHistory }
