@@ -24,7 +24,6 @@ import {
 } from "react-icons/fi";
 import { addToCart, getProductDetail } from "../../service/user";
 import { useNavigate, useParams } from "react-router-dom";
-import { all } from "axios";
 import { toast, ToastContainer } from "react-toastify";
 
 const mockProduct = {
@@ -64,6 +63,7 @@ export default function ProductDetail() {
       setLoading(true);
       try {
         const response = await getProductDetail(id);
+        console.log(response);
         setProduct(response);
       } catch (error) {
         console.log(error);
@@ -78,20 +78,20 @@ export default function ProductDetail() {
   const handleAddToCart = async () => {
     const token = localStorage.getItem("token");
     if (!token) {
-      console.log("Chuaw cos token");
+      // You might want to handle this case - redirect to login or show login modal
+      // toast.error("Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng");
       return;
     }
 
     try {
       const response = await addToCart(product.id, quantity, selectedSize.size);
-      console.log("Thêm vào giỏ hàng thành công:", response);
-
-      if (response.data.code === 200) {
-        toast.success("Thêm vào giỏ hàng thành công!");
+      if (response?.data?.code === 200) {
+        toast.success("Thêm vào giỏ hàng thành công");
+      } else {
+        toast.error("Thêm vào giỏ hàng thất bại");
       }
     } catch (error) {
       console.error("Có lỗi:", error);
-      toast.error("Thêm vào giỏ hàng thất bại!");
     }
   };
 
@@ -146,7 +146,7 @@ export default function ProductDetail() {
   // };
 
   // const colorMap = {
-  //   "Màu trắng": "#fffff",
+  //   Trắng: "#fffff",
   //   Đỏ: "#ff0000",
   // };
 
@@ -253,21 +253,6 @@ export default function ProductDetail() {
           </div>
 
           {/* Color */}
-          {/* <div className="mb-4">
-            <h5 className="fw-semibold mb-2">Màu sắc:</h5>
-            <div className="d-flex align-items-center gap-2">
-              <div
-                className="rounded-circle border border-2"
-                style={{
-                  width: "30px",
-                  height: "30px",
-                  backgroundColor: colorMap,
-                  borderColor: "#dee2e6",
-                }}
-              ></div>
-              <span className="fw-medium">{product?.color}</span>
-            </div>
-          </div> */}
           <div className="mb-4">
             <h5 className="fw-semibold mb-2">Màu sắc:</h5>
             <div className="d-flex align-items-center gap-2">
@@ -276,7 +261,7 @@ export default function ProductDetail() {
                 style={{
                   width: "30px",
                   height: "30px",
-                  backgroundColor: "#ffffff", // trắng luôn
+                  backgroundColor: "#fff",
                   borderColor: "#dee2e6",
                 }}
               ></div>
@@ -446,7 +431,7 @@ export default function ProductDetail() {
                     <ListGroup.Item className="d-flex justify-content-between py-3">
                       <span className="fw-medium">Chất liệu:</span>
                       <span className="text-muted">
-                        {product?.fabric.fabricName || " Đang tải"}
+                        {product?.fabric?.fabricName || " Đang tải"}
                       </span>
                     </ListGroup.Item>
                     <ListGroup.Item className="d-flex justify-content-between py-3">

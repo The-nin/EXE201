@@ -4,13 +4,13 @@ import CustomShirtOrder from "../../pages/customOrderPage/CustomShirtOrder";
 import ProductDetail from "../../pages/productPage/ProductDetail";
 import OrderHistory from "../../pages/orderHistoryPage/OrderHistory";
 import Success from "../../pages/adminPage/BookOrderMngPage/Success";
+import OrderComplete from "../../pages/cart/order-complete";
 const LandingPage = lazy(() => import("../../pages/landingPage/index"));
 const AboutUsPage = lazy(() => import("../../pages/aboutUsPage/AboutUsPage"));
 const ProductPage = lazy(() => import("../../pages/productPage/product"));
 const ContactPage = lazy(() => import("../../pages/contactPage/contact"));
 const ProfilePage = lazy(() => import("../../pages/profilePage/ProfilePage"));
 const CartPage = lazy(() => import("../../pages/cart/cart"));
-const OrderCompletePage = lazy(() => import("../../pages/cart/orderComplete"));
 
 const userRoutes = [
   {
@@ -46,12 +46,16 @@ const userRoutes = [
     element: <Success />,
   },
   {
-    path: ROUTES.ORDER_COMPLETE,
-    element: <OrderCompletePage />,
+    path: ROUTES.CART_PAGE,
+    element: <CartPage />,
   },
   {
     path: ROUTES.ORDER_HISTORY_PAGE,
     element: <OrderHistory />,
+  },
+  {
+    path: ROUTES.ORDER_COMPLETE,
+    element: <OrderComplete />,
   },
 ];
 

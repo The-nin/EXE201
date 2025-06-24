@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import {
   Card,
   Row,
@@ -47,10 +47,9 @@ const { RangePicker } = DatePicker;
 
 export default function OrderHistory() {
   const location = useLocation();
-  const [orderHistory, setOrderHistory] = useState([]);
+  const [orders, setOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [searchText, setSearchText] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [dateRange, setDateRange] = useState(null);
@@ -59,48 +58,190 @@ export default function OrderHistory() {
   );
   const [showDetailModal, setShowDetailModal] = useState(false);
 
-  const fetchOrders = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+  const [orderHistory, setOrderHistory] = useState([]);
+
+  const getOrderHistoryList = async () => {
     try {
       const response = await getOrderHistory();
+      console.log(response);
+
       const sortedLatestOrders = response.data.result.sort(
         (a, b) =>
-          new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime()
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
+
       setOrderHistory(sortedLatestOrders);
-      setFilteredOrders(sortedLatestOrders);
     } catch (error) {
       console.error("Error fetching order history:", error);
-      setError("Không thể tải danh sách đơn hàng");
-      message.error("Không thể tải danh sách đơn hàng");
-    } finally {
-      setLoading(false);
     }
-  }, []);
+  };
 
-  const handleViewDetail = async (order) => {
-    console.log(order);
-    setLoading(true);
+  const handleGetDetail = async () => {
     try {
-      const response = await getOrderDetail(order.orderId);
+      const response = await getOrderDetail();
       console.log(response);
-      setSelectedOrder(response.data.result);
-      setShowDetailModal(true);
+      return response;
     } catch (error) {
-      console.error("Error fetching order details:", error);
-      message.error("Không thể tải chi tiết đơn hàng");
-    } finally {
-      setLoading(false);
+      console.error("Error fetching order history:", error);
     }
   };
 
   useEffect(() => {
-    fetchOrders();
-  }, [fetchOrders]);
+    getOrderHistoryList();
+  }, []);
+
+  // Mock data - replace with real API call
+  const mockOrders = [
+    {
+      orderId: "ORD-2024-001234",
+      orderDate: "2024-01-20 14:30:25",
+      status: "delivered",
+      statusText: "Đã giao hàng",
+      paymentMethod: "COD",
+      totalAmount: 897000,
+      itemCount: 3,
+      shippingAddress: {
+        fullName: "Nguyen Van A",
+        phone: "0909123456",
+        address: "123 Nguyễn Huệ",
+        ward: "P.Bến Nghé",
+        district: "Q.1",
+        city: "TP.HCM",
+      },
+      items: [
+        {
+          productName: "Áo thun custom design",
+          quantity: 2,
+          price: 299000,
+          image: "/placeholder.svg?height=60&width=60",
+          color: "Trắng",
+          size: "M",
+        },
+        {
+          productName: "Áo hoodie premium",
+          quantity: 1,
+          price: 599000,
+          image: "/placeholder.svg?height=60&width=60",
+          color: "Đen",
+          size: "L",
+        },
+      ],
+    },
+    {
+      orderId: "ORD-2024-001235",
+      orderDate: "2024-01-18 10:15:30",
+      status: "shipping",
+      statusText: "Đang giao hàng",
+      paymentMethod: "VNPAY",
+      totalAmount: 1250000,
+      itemCount: 2,
+      shippingAddress: {
+        fullName: "Tran Thi B",
+        phone: "0918234567",
+        address: "456 Lê Lợi",
+        ward: "P.Bến Thành",
+        district: "Q.1",
+        city: "TP.HCM",
+      },
+      items: [
+        {
+          productName: "Áo polo custom",
+          quantity: 1,
+          price: 450000,
+          image: "/placeholder.svg?height=60&width=60",
+          color: "Xanh",
+          size: "L",
+        },
+        {
+          productName: "Áo khoác bomber",
+          quantity: 1,
+          price: 800000,
+          image: "/placeholder.svg?height=60&width=60",
+          color: "Đen",
+          size: "XL",
+        },
+      ],
+    },
+    {
+      orderId: "ORD-2024-001236",
+      orderDate: "2024-01-15 16:45:12",
+      status: "processing",
+      statusText: "Đang xử lý",
+      paymentMethod: "COD",
+      totalAmount: 599000,
+      itemCount: 1,
+      shippingAddress: {
+        fullName: "Le Van C",
+        phone: "0987345678",
+        address: "789 Trần Hưng Đạo",
+        ward: "P.Cầu Kho",
+        district: "Q.1",
+        city: "TP.HCM",
+      },
+      items: [
+        {
+          productName: "Áo sweater premium",
+          quantity: 1,
+          price: 599000,
+          image: "/placeholder.svg?height=60&width=60",
+          color: "Xám",
+          size: "M",
+        },
+      ],
+    },
+    {
+      orderId: "ORD-2024-001237",
+      orderDate: "2024-01-10 09:20:45",
+      status: "cancelled",
+      statusText: "Đã hủy",
+      paymentMethod: "VNPAY",
+      totalAmount: 750000,
+      itemCount: 2,
+      shippingAddress: {
+        fullName: "Pham Thi D",
+        phone: "0976456789",
+        address: "321 Pasteur",
+        ward: "P.Võ Thị Sáu",
+        district: "Q.3",
+        city: "TP.HCM",
+      },
+      items: [
+        {
+          productName: "Áo thun oversize",
+          quantity: 2,
+          price: 375000,
+          image: "/placeholder.svg?height=60&width=60",
+          color: "Trắng",
+          size: "L",
+        },
+      ],
+    },
+  ];
 
   useEffect(() => {
-    let filtered = [...orderHistory];
+    fetchOrders();
+  }, []);
+
+  useEffect(() => {
+    filterOrders();
+  }, [orders, searchText, statusFilter, dateRange]);
+
+  const fetchOrders = async () => {
+    setLoading(true);
+    try {
+      setTimeout(() => {
+        setOrders(mockOrders);
+        setLoading(false);
+      }, 1000);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+      message.error("Không thể tải danh sách đơn hàng");
+      setLoading(false);
+    }
+  };
+
+  const filterOrders = () => {
+    let filtered = [...orders];
 
     if (searchText) {
       filtered = filtered.filter(
@@ -125,7 +266,7 @@ export default function OrderHistory() {
     }
 
     setFilteredOrders(filtered);
-  }, [orderHistory, searchText, statusFilter, dateRange]);
+  };
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat("vi-VN", {
@@ -134,25 +275,13 @@ export default function OrderHistory() {
     }).format(price);
   };
 
-  const translateStatus = (status) => {
-    const statusTranslations = {
-      PENDING: "Đang chờ xử lý",
-      PAYMENT: "Đã thanh toán",
-      CONFIRMED: "Xác nhận thành công",
-      DELIVERED: "Đang giao hàng ",
-      CANCELLED: "Đã hủy",
-    };
-    return statusTranslations[status] || status;
-  };
-
   const getStatusColor = (status) => {
     const statusColors = {
-      PENDING: "orange",
-      PAYMENT: "blue",
-      CONFIRMED: "blue",
-      DELIVERED: "cyan",
-      FINISHED: "green",
-      CANCELLED: "red",
+      pending: "orange",
+      processing: "blue",
+      shipping: "cyan",
+      delivered: "green",
+      cancelled: "red",
     };
     return statusColors[status] || "default";
   };
@@ -166,6 +295,11 @@ export default function OrderHistory() {
       cancelled: <CloseCircleOutlined />,
     };
     return statusIcons[status] || <ClockCircleOutlined />;
+  };
+
+  const handleViewDetail = (order) => {
+    setSelectedOrder(order);
+    setShowDetailModal(true);
   };
 
   const handleReorder = (order) => {
@@ -190,15 +324,8 @@ export default function OrderHistory() {
       okText: "Hủy đơn hàng",
       okType: "danger",
       onOk: () => {
-        setOrderHistory((prevOrders) =>
-          prevOrders?.map((o) =>
-            o.orderId === order.orderId
-              ? { ...o, status: "cancelled", statusText: "Đã hủy" }
-              : o
-          )
-        );
-        setFilteredOrders((prevOrders) =>
-          prevOrders?.map((o) =>
+        setOrders((prevOrders) =>
+          prevOrders.map((o) =>
             o.orderId === order.orderId
               ? { ...o, status: "cancelled", statusText: "Đã hủy" }
               : o
@@ -217,33 +344,18 @@ export default function OrderHistory() {
     alert("Chia sẻ đơn hàng: " + selectedOrder?.orderId);
   };
 
-  // const getCurrentStep = (status) => {
-  //   const statusOrder = {
-  //     pending: 0,
-  //     processing: 1,
-  //     shipping: 2,
-  //     delivered: 3,
-  //     cancelled: -1,
-  //   };
-  //   return statusOrder[status] !== undefined ? statusOrder[status] : 0;
-  // };
   const getCurrentStep = (status) => {
-    switch (status) {
-      case "PENDING":
-        return 0;
-      case "PAYMENT":
-      case "CONFIRMED":
-        return 1;
-      case "DELIVERED":
-        return 2;
-      case "FINISHED":
-        return 3;
-      default:
-        return 0;
-    }
+    const statusOrder = {
+      pending: 0,
+      processing: 1,
+      shipping: 2,
+      delivered: 3,
+      cancelled: -1,
+    };
+    return statusOrder[status] !== undefined ? statusOrder[status] : 0;
   };
 
-  const OrderCard = ({ order = [] }) => (
+  const OrderCard = ({ order }) => (
     <Card
       style={{
         marginBottom: "16px",
@@ -257,13 +369,13 @@ export default function OrderHistory() {
           <Col>
             <Space>
               <Text strong style={{ color: "#1890ff", fontSize: "16px" }}>
-                #{order.orderId}
+                {order.orderId}
               </Text>
               <Tag
                 color={getStatusColor(order.status)}
                 icon={getStatusIcon(order.status)}
               >
-                {translateStatus(order.status)}
+                {order.statusText}
               </Tag>
             </Space>
           </Col>
@@ -278,14 +390,14 @@ export default function OrderHistory() {
 
       <div style={{ marginBottom: "16px" }}>
         <Row gutter={[12, 12]}>
-          {order?.orderResponseItemList?.map((item, index) => (
+          {order.items.slice(0, 3).map((item, index) => (
             <Col key={index} xs={24} sm={12} md={8}>
               <div
                 style={{ display: "flex", alignItems: "center", gap: "12px" }}
               >
                 <Avatar
-                  src={item.thumbnailProduct || "/placeholder.svg"}
-                  size={100}
+                  src={item.image || "/placeholder.svg"}
+                  size={50}
                   shape="square"
                   style={{ borderRadius: "8px" }}
                 />
@@ -303,18 +415,16 @@ export default function OrderHistory() {
                     {item.productName}
                   </Text>
                   <Text type="secondary" style={{ fontSize: "12px" }}>
-                    {/* | {item.size}  */}
-                    Màu trắng | x{item.quantity}
+                    {item.color} | {item.size} | x{item.quantity}
                   </Text>
                   <Text strong style={{ color: "#ff4d4f", fontSize: "13px" }}>
-                    {" "}
                     {formatPrice(item.price)}
                   </Text>
                 </div>
               </div>
             </Col>
           ))}
-          {order?.items?.length > 3 && (
+          {order.items.length > 3 && (
             <Col xs={24} sm={12} md={8}>
               <div
                 style={{
@@ -377,7 +487,7 @@ export default function OrderHistory() {
               Đặt lại
             </Button>
           )}
-          {order.status === "PENDING" && (
+          {(order.status === "pending" || order.status === "processing") && (
             <Button
               size="small"
               danger
@@ -465,31 +575,6 @@ export default function OrderHistory() {
             Đang tải danh sách đơn hàng...
           </div>
         </div>
-      ) : error ? (
-        <Card
-          style={{ textAlign: "center", padding: "50px", borderRadius: "12px" }}
-        >
-          <Empty
-            image={Empty.PRESENTED_IMAGE_SIMPLE}
-            description={
-              <div>
-                <Title level={4} style={{ color: "#999" }}>
-                  {error}
-                </Title>
-                <Text type="secondary">Thử làm mới hoặc liên hệ hỗ trợ</Text>
-              </div>
-            }
-          >
-            <Button
-              type="primary"
-              icon={<ReloadOutlined />}
-              onClick={fetchOrders}
-              size="large"
-            >
-              Thử lại
-            </Button>
-          </Empty>
-        </Card>
       ) : filteredOrders.length === 0 ? (
         <Card
           style={{ textAlign: "center", padding: "50px", borderRadius: "12px" }}
@@ -514,7 +599,7 @@ export default function OrderHistory() {
         </Card>
       ) : (
         <div>
-          {filteredOrders?.map((order) => (
+          {filteredOrders.map((order) => (
             <OrderCard key={order.orderId} order={order} />
           ))}
         </div>
@@ -548,7 +633,9 @@ export default function OrderHistory() {
         {selectedOrder && (
           <div>
             <Row gutter={[24, 24]}>
+              {/* Order Details */}
               <Col xs={24} lg={14}>
+                {/* Order Info */}
                 <Card
                   title="Thông tin đơn hàng"
                   style={{ marginBottom: "16px" }}
@@ -556,7 +643,7 @@ export default function OrderHistory() {
                   <Descriptions column={2} size="small">
                     <Descriptions.Item label="Mã đơn hàng" span={2}>
                       <Text strong style={{ color: "#1890ff" }}>
-                        #{selectedOrder?.orderId}
+                        {selectedOrder?.orderId}
                       </Text>
                     </Descriptions.Item>
                     <Descriptions.Item label="Ngày đặt hàng">
@@ -567,7 +654,7 @@ export default function OrderHistory() {
                     </Descriptions.Item>
                     <Descriptions.Item label="Trạng thái">
                       <Tag color={getStatusColor(selectedOrder.status)}>
-                        {translateStatus(selectedOrder.status) || "Đang tải"}
+                        {selectedOrder.statusText}
                       </Tag>
                     </Descriptions.Item>
                     <Descriptions.Item label="Phương thức thanh toán">
@@ -578,94 +665,96 @@ export default function OrderHistory() {
                     </Descriptions.Item>
                     <Descriptions.Item label="Dự kiến giao hàng">
                       <TruckOutlined style={{ marginRight: "4px" }} />
-                      {selectedOrder.status === "DELIVERED"
+                      {selectedOrder.status === "delivered"
                         ? "Đã giao"
                         : "2-3 ngày làm việc"}
                     </Descriptions.Item>
                   </Descriptions>
                 </Card>
 
+                {/* Order Items */}
                 <Card title="Sản phẩm đã đặt">
                   <Space direction="vertical" style={{ width: "100%" }}>
-                    {selectedOrder?.orderResponseItemList?.map(
-                      (item, index) => (
-                        <div key={index}>
-                          <Row align="middle" gutter={16}>
-                            <Col flex="60px">
-                              <img
-                                src={
-                                  item.thumbnailProduct || "/placeholder.svg"
-                                }
-                                alt={item.productName}
-                                style={{
-                                  width: "60px",
-                                  height: "60px",
-                                  objectFit: "cover",
-                                  borderRadius: "6px",
-                                  border: "1px solid #f0f0f0",
-                                }}
-                              />
-                            </Col>
-                            <Col flex="auto">
-                              <div>
-                                <Text strong>{item.productName}</Text>
-                                <br />
-                                <Text
-                                  type="secondary"
-                                  style={{ fontSize: "12px" }}
-                                >
-                                  Màu: Trắng | Size: {item.size}
-                                </Text>
-                              </div>
-                            </Col>
-                            <Col>
-                              <Text>x{item.quantity}</Text>
-                            </Col>
-                            <Col>
-                              <Text strong style={{ color: "#ff4d4f" }}>
-                                {formatPrice(item.price)}
+                    {selectedOrder?.items.map((item, index) => (
+                      <div key={index}>
+                        <Row align="middle" gutter={16}>
+                          <Col flex="60px">
+                            <img
+                              src={item.image || "/placeholder.svg"}
+                              alt={item.productName}
+                              style={{
+                                width: "60px",
+                                height: "60px",
+                                objectFit: "cover",
+                                borderRadius: "6px",
+                                border: "1px solid #f0f0f0",
+                              }}
+                            />
+                          </Col>
+                          <Col flex="auto">
+                            <div>
+                              <Text strong>{item.productName}</Text>
+                              <br />
+                              <Text
+                                type="secondary"
+                                style={{ fontSize: "12px" }}
+                              >
+                                Màu: {item.color} | Size: {item.size}
                               </Text>
-                            </Col>
-                          </Row>
-                          {index <
-                            selectedOrder?.orderResponseItemList?.length -
-                              1 && <Divider style={{ margin: "12px 0" }} />}
-                        </div>
-                      )
-                    )}
+                            </div>
+                          </Col>
+                          <Col>
+                            <Text>x{item.quantity}</Text>
+                          </Col>
+                          <Col>
+                            <Text strong style={{ color: "#ff4d4f" }}>
+                              {formatPrice(item.price)}
+                            </Text>
+                          </Col>
+                        </Row>
+                        {index < selectedOrder.items.length - 1 && (
+                          <Divider style={{ margin: "12px 0" }} />
+                        )}
+                      </div>
+                    ))}
                   </Space>
                 </Card>
 
+                {/* Shipping Address */}
                 <Card title="Địa chỉ giao hàng" style={{ marginTop: "16px" }}>
                   <Space direction="vertical" size="small">
                     <div>
                       <HomeOutlined
                         style={{ marginRight: "8px", color: "#1890ff" }}
                       />
-                      <Text strong>{selectedOrder?.address?.name}</Text>
+                      <Text strong>
+                        {selectedOrder?.shippingAddress.fullName}
+                      </Text>
                     </div>
                     <div>
                       <PhoneOutlined
                         style={{ marginRight: "8px", color: "#1890ff" }}
                       />
-                      <Text>{selectedOrder?.address?.phone}</Text>
+                      <Text>{selectedOrder?.shippingAddress.phone}</Text>
                     </div>
                     <div>
                       <MailOutlined
                         style={{ marginRight: "8px", color: "#1890ff" }}
                       />
                       <Text>
-                        {selectedOrder?.address?.addressLine} Phường{" "}
-                        {selectedOrder?.address?.ward} Quận{" "}
-                        {selectedOrder?.address?.district} Tp{" "}
-                        {selectedOrder?.address?.city}
+                        {selectedOrder?.shippingAddress.address},{" "}
+                        {selectedOrder?.shippingAddress.ward},{" "}
+                        {selectedOrder?.shippingAddress.district},{" "}
+                        {selectedOrder?.shippingAddress.city}
                       </Text>
                     </div>
                   </Space>
                 </Card>
               </Col>
 
+              {/* Order Summary & Timeline */}
               <Col xs={24} lg={10}>
+                {/* Order Summary */}
                 <Card title="Tóm tắt đơn hàng" style={{ marginBottom: "16px" }}>
                   <Space direction="vertical" style={{ width: "100%" }}>
                     <div
@@ -676,7 +765,7 @@ export default function OrderHistory() {
                     >
                       <Text>Tạm tính:</Text>
                       <Text>
-                        {formatPrice(selectedOrder?.totalAmount || 0)}
+                        {formatPrice((selectedOrder?.totalAmount || 0) - 30000)}
                       </Text>
                     </div>
                     <div
@@ -686,7 +775,7 @@ export default function OrderHistory() {
                       }}
                     >
                       <Text>Phí vận chuyển:</Text>
-                      <Text>{formatPrice(0)}</Text>
+                      <Text>{formatPrice(30000)}</Text>
                     </div>
                     <Divider style={{ margin: "8px 0" }} />
                     <div
@@ -727,6 +816,7 @@ export default function OrderHistory() {
                   </Space>
                 </Card>
 
+                {/* Order Timeline */}
                 <Card title="Tiến trình đơn hàng">
                   <Steps
                     direction="vertical"
@@ -735,17 +825,7 @@ export default function OrderHistory() {
                   >
                     <Steps.Step
                       status={
-                        [
-                          "PENDING",
-                          "PAYMENT",
-                          "CONFIRMED",
-                          "DELIVERED",
-                          "FINISHED",
-                        ].includes(selectedOrder.status)
-                          ? "finish"
-                          : selectedOrder.status === "CANCELLED"
-                          ? "error"
-                          : "wait"
+                        selectedOrder.status === "delivered" ? "finish" : "wait"
                       }
                       title="Đặt hàng thành công"
                       description="Đơn hàng đã được tiếp nhận"
@@ -753,12 +833,9 @@ export default function OrderHistory() {
                     />
                     <Steps.Step
                       status={
-                        [
-                          "PAYMENT",
-                          "CONFIRMED",
-                          "DELIVERED",
-                          "FINISHED",
-                        ].includes(selectedOrder.status)
+                        selectedOrder.status === "processing" ||
+                        selectedOrder.status === "shipping" ||
+                        selectedOrder.status === "delivered"
                           ? "finish"
                           : "wait"
                       }
@@ -766,10 +843,10 @@ export default function OrderHistory() {
                       description="Đang chuẩn bị hàng hóa"
                       icon={<ShoppingOutlined />}
                     />
-
                     <Steps.Step
                       status={
-                        ["DELIVERED", "FINISHED"].includes(selectedOrder.status)
+                        selectedOrder.status === "shipping" ||
+                        selectedOrder.status === "delivered"
                           ? "finish"
                           : "wait"
                       }
@@ -777,10 +854,9 @@ export default function OrderHistory() {
                       description="Đơn hàng đang được vận chuyển"
                       icon={<TruckOutlined />}
                     />
-
                     <Steps.Step
                       status={
-                        selectedOrder.status === "FINISHED" ? "finish" : "wait"
+                        selectedOrder.status === "delivered" ? "finish" : "wait"
                       }
                       title="Đã giao hàng"
                       description="Giao hàng thành công"
@@ -789,6 +865,7 @@ export default function OrderHistory() {
                   </Steps>
                 </Card>
 
+                {/* Contact Info */}
                 <Card title="Hỗ trợ khách hàng" style={{ marginTop: "16px" }}>
                   <Space direction="vertical" size="small">
                     <Text>
@@ -812,6 +889,7 @@ export default function OrderHistory() {
               </Col>
             </Row>
 
+            {/* Additional Info */}
             <Card style={{ marginTop: "24px" }}>
               <Title level={5}>Lưu ý quan trọng:</Title>
               <ul style={{ paddingLeft: "20px", margin: 0 }}>

@@ -41,7 +41,7 @@ const LoginAdmin = () => {
           return;
         }
         localStorage.removeItem("token");
-        localStorage.removeItem("fullname");
+        localStorage.removeItem("username");
         localStorage.removeItem("userTokenExpiration");
         localStorage.setItem("admin", response.data.result.role);
 

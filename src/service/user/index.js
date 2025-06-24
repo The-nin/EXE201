@@ -1,17 +1,15 @@
 import { instance } from "../instance";
-const getAuthHeader = () => {
-  const token = localStorage.getItem("token");
-  return {
+const token = localStorage.getItem("token");
+const authHeader = {
     headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  };
-};
+        Authorization: `Bearer ${token}`
+    }
+}
 
 
 const getProductDetail = async (id) => {
     try {
-        const response = await instance.get(`/api/products/${id}`, getAuthHeader())
+        const response = await instance.get(`/api/products/${id}`, authHeader)
         return response.data.result
     } catch (error) {
         console.log("error", error);
@@ -19,11 +17,10 @@ const getProductDetail = async (id) => {
 }
 
 const addToCart = async (productId, quantity, size) => {
-
     try {
         const response = await instance.post(`/carts?productId=${productId}&quantity=${quantity}&size=${size}`,
             null,
-            getAuthHeader()
+            authHeader
         )
         return response
     } catch (error) {
@@ -49,7 +46,7 @@ export const paymentBookOrder = async (orderCode , amount) => {
 }
 const bookOrder = async(data) => {
     try{
-        const response = await instance.post("/api/bookOrder", data, getAuthHeader())   
+        const response = await instance.post("/api/bookOrder", data, authHeader)   
         return response.data
     }catch(error){
         console.log("error", error);
@@ -58,7 +55,7 @@ const bookOrder = async(data) => {
 
 const getCart = async () => {
     try {
-        const response = await instance.get("/carts", getAuthHeader())
+        const response = await instance.get("/carts", authHeader)
         return response.data.result
     } catch (error) {
         console.log("error", error);
@@ -70,7 +67,7 @@ const updateCart = async(productId, quantity) => {
         const response = await instance.patch(
                 `/carts/update-quantity?productId=${productId}&quantity=${quantity}`,
                 {},
-                getAuthHeader()
+                authHeader
             )
         return response;
     } catch (error) {
@@ -93,7 +90,7 @@ const deleteCart = async (productIds) => {
     const params = new URLSearchParams();
     productIds.forEach((id) => params.append("productIds", id));
 
-    const response = await instance.delete(`/carts/remove?${params.toString()}`, getAuthHeader());
+    const response = await instance.delete(`/carts/remove?${params.toString()}`, authHeader);
     console.log(response);
     return response;
   } catch (error) {
@@ -101,13 +98,14 @@ const deleteCart = async (productIds) => {
   }
 };
 
-const createOrder = async ({cartId , addressId , paymentMethod}) => {
+const createOrder = async (cartId , addressId , paymentMethod ) => {
     try {
         const response = await instance.post(
             `/api/payment?cartId=${cartId}&addressId=${addressId}&paymentMethod=${paymentMethod}`,
             {},
-            getAuthHeader()
+            authHeader
         )
+        console.log(response);
         return response;
     } catch (error) {
         console.error("Error:", error);
@@ -115,23 +113,34 @@ const createOrder = async ({cartId , addressId , paymentMethod}) => {
 }
 
 const getOrderHistory = async () => {
-    try{
-        const response = await instance.get("/orders/history-order", getAuthHeader())
+    const token = localStorage.getItem("token");
+    const authHeader = {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }
+    try {
+        const response = await instance.get("/order/history-order", authHeader);
         return response
-    } catch (err) {
-        console.log("Error:", err);
+    } catch (error) {
+        console.log(error)
     }
 }
 
 const getOrderDetail = async (id) => {
-    try{
-        const response = await instance.get(`/orders/${id}`, getAuthHeader())
+    const token = localStorage.getItem("token");
+    const authHeader = {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }
+    try {
+        const response = await instance.get(`/orders/${id}`, authHeader);
         return response
-    } catch (err) {
-        console.log("Error:", err)
+    } catch (error) {
+        console.log(error)
     }
 }
 
 export { bookOrder, getProductDetail, addToCart, getCart, updateCart, deleteCart, createOrder,
-    getOrderHistory, getOrderDetail
- }
+    getOrderDetail, getOrderHistory }

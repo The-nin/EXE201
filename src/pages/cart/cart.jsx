@@ -31,7 +31,7 @@ import {
   updateCart,
 } from "../../service/user";
 import { getAddressByUser } from "../../service/admin";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import { instance } from "../../service/instance";
 
 export default function Cart() {
@@ -59,6 +59,7 @@ export default function Cart() {
     fullName: "",
     phone: "",
     addressLine: "",
+
     ward: "",
     district: "",
     city: "",
@@ -258,16 +259,15 @@ export default function Cart() {
     }
 
     try {
-      const response = await createOrder({
-        cartId: cart?.cartId,
-        addressId: shippingAddress.addressId,
-        paymentMethod: shippingAddress.paymentMethod,
-      });
+      const response = await createOrder(
+        cart?.cartId,
+        shippingAddress.addressId,
+        shippingAddress.paymentMethod
+      );
 
       if (response?.data?.code === 200) {
         toast.success("Đặt hàng thành công!");
-        const orderId = response.data.result.orderId;
-        navigate("/order-complete", { state: { orderId } });
+        navigate("/order-complete");
       } else {
         toast.error(response?.data?.message || "Đặt hàng thất bại");
       }
@@ -306,46 +306,58 @@ export default function Cart() {
   };
 
   const validateAddress = () => {
-    return !!shippingAddress.addressId && !!shippingAddress.paymentMethod;
+    //return !!shippingAddress.addressId && !!shippingAddress.paymentMethod;
     const required = [
       "fullName",
       "phone",
-      "address",
+      "addressLine",
       "ward",
       "district",
       "city",
     ];
-    return required.every((field) => shippingAddress[field].trim() !== "");
+    // return required.every((field) => shippingAddress[field].trim() !== "");
+    const addressValid = required.every(
+      (field) =>
+        typeof shippingAddress[field] === "string" &&
+        shippingAddress[field].trim() !== ""
+    );
+
+    // Also check if payment method is selected
+    const paymentMethodValid =
+      shippingAddress.paymentMethod &&
+      shippingAddress.paymentMethod.trim() !== "";
+
+    return addressValid && paymentMethodValid;
   };
 
-  const handleCheckout = () => {
-    if (cartItems.length === 0) {
-      alert("Giỏ hàng trống!");
-      return;
-    }
+  // const handleCheckout = () => {
+  //   if (cartItems.length === 0) {
+  //     alert("Giỏ hàng trống!");
+  //     return;
+  //   }
 
-    // const outOfStockItems = cartItems.filter((item) => !item.inStock);
-    // if (outOfStockItems.length > 0) {
-    //   alert("Có sản phẩm hết hàng trong giỏ hàng. Vui lòng xóa hoặc thay thế!");
-    //   return;
-    // }
+  //   // const outOfStockItems = cartItems.filter((item) => !item.inStock);
+  //   // if (outOfStockItems.length > 0) {
+  //   //   alert("Có sản phẩm hết hàng trong giỏ hàng. Vui lòng xóa hoặc thay thế!");
+  //   //   return;
+  //   // }
 
-    if (!validateAddress()) {
-      alert("Vui lòng điền đầy đủ thông tin địa chỉ nhận hàng!");
-      return;
-    }
+  //   if (!validateAddress()) {
+  //     alert("Vui lòng điền đầy đủ thông tin địa chỉ nhận hàng!");
+  //     return;
+  //   }
 
-    // Navigate to checkout page
-    navigate("/checkout", {
-      state: {
-        cartItems,
-        shippingAddress,
-        subtotal: calculateSubtotal(),
-        shipping: calculateShipping(),
-        total: calculateTotal(),
-      },
-    });
-  };
+  //   // Navigate to checkout page
+  //   navigate("/checkout", {
+  //     state: {
+  //       cartItems,
+  //       shippingAddress,
+  //       subtotal: calculateSubtotal(),
+  //       shipping: calculateShipping(),
+  //       total: calculateTotal(),
+  //     },
+  //   });
+  // };
 
   if (loading) {
     return (
@@ -361,6 +373,17 @@ export default function Cart() {
 
   return (
     <Container className="py-4">
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
       <Row className="mb-4">
         <Col>
           <div className="d-flex align-items-center justify-content-between">
@@ -613,6 +636,7 @@ export default function Cart() {
                   <span>Tạm tính:</span>
                   <span>{formatPrice(calculateSubtotal())}</span>
                 </div>
+
                 <div className="d-flex justify-content-between mb-2">
                   <span>
                     <FiTruck className="me-1" />
@@ -626,13 +650,16 @@ export default function Cart() {
                     )}
                   </span>
                 </div>
+
                 <hr />
+
                 <div className="d-flex justify-content-between mb-3">
                   <strong>Tổng cộng:</strong>
                   <strong className="text-danger fs-5">
                     {formatPrice(calculateTotal())}
                   </strong>
                 </div>
+
                 <Button
                   variant="primary"
                   size="lg"
@@ -643,12 +670,14 @@ export default function Cart() {
                   <FiCreditCard className="me-2" />
                   Đặt hàng
                 </Button>
+
                 <div className="text-center">
                   <small className="text-muted">
                     <FiTruck className="me-1" />
-                    Miễn phí vận chuyển cho đơn hàng từ {formatPrice(500000)}
+                    Miễn phí vận chuyển cho đơn hàng từ {formatPrice(250000)}
                   </small>
                 </div>
+
                 {validateAddress() && (
                   <div className="mt-3 p-3 bg-light rounded">
                     <h6 className="mb-2">
@@ -667,6 +696,7 @@ export default function Cart() {
                 )}
               </Card.Body>
             </Card>
+
             <Card className="mt-3">
               <Card.Body className="p-3">
                 <h6 className="mb-2">
@@ -676,7 +706,7 @@ export default function Cart() {
                 <ul className="list-unstyled mb-0 small text-muted">
                   <li className="mb-1">• Giao hàng trong 2-3 ngày làm việc</li>
                   <li className="mb-1">
-                    • Miễn phí vận chuyển cho đơn từ 500.000đ
+                    • Miễn phí vận chuyển cho đơn từ 250.000đ
                   </li>
                   <li className="mb-1">• Hỗ trợ đổi trả trong 7 ngày</li>
                   <li>• Thanh toán khi nhận hàng</li>
