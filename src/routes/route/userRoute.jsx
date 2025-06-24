@@ -4,7 +4,7 @@ import CustomShirtOrder from "../../pages/customOrderPage/CustomShirtOrder";
 import ProductDetail from "../../pages/productPage/ProductDetail";
 import OrderHistory from "../../pages/orderHistoryPage/OrderHistory";
 import Success from "../../pages/adminPage/BookOrderMngPage/Success";
-import OrderComplete from "../../pages/cart/order-complete";
+import OrderComplete from "../../pages/cart/Order-complete";
 const LandingPage = lazy(() => import("../../pages/landingPage/index"));
 const AboutUsPage = lazy(() => import("../../pages/aboutUsPage/AboutUsPage"));
 const ProductPage = lazy(() => import("../../pages/productPage/product"));
