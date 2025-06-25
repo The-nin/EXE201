@@ -161,7 +161,7 @@ function LoginPage() {
                   className="back-to-home-link d-flex justify-content-center align-items-center"
                   style={{
                     fontSize: "16px",
-                    color: "#f38280",
+                    color: "#000000",
                     fontWeight: "600",
                     textDecoration: "none",
                   }}
