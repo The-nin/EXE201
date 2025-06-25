@@ -120,7 +120,7 @@ const getOrderHistory = async () => {
         }
     }
     try {
-        const response = await instance.get("/order/history-order", authHeader);
+        const response = await instance.get("/orders/history-order", authHeader);
         return response
     } catch (error) {
         console.log(error)
