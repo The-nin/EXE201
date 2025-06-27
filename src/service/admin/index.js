@@ -127,14 +127,15 @@ export const assignDesigner = async (bookOrderId, data) => {
   }
 };
 
-export const deliverySuccess = async (id, formData) => {
+export const deliverySuccess = async (id, payload) => {
   try {
-    const response = await axios.patch(
-      `http://localhost:8080/api/bookOrder/delivery/${id}`,
-      formData,
+    const token = localStorage.getItem("token");
+    const response = await instance.patch(
+      `/api/bookOrder/delivery/${id}`,
+      payload,
       {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
       }
@@ -146,6 +147,27 @@ export const deliverySuccess = async (id, formData) => {
   }
 };
 
+export const designUploadSuccess = async (id, payload) => {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await instance.patch(
+      `/api/bookOrder/designer/${id}`,
+      payload,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    console.log(response.data)
+    return response.data;
+    
+  } catch (error) {
+    console.error("API error:", error);
+    throw error;
+  }
+};
 
 
 export const getAddressByUser = async () => {

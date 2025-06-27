@@ -22,9 +22,12 @@ import {
   getAddressId,
   changeStatus,
   deliverySuccess,
+  designUploadSuccess
 } from "../../../service/admin";
 import "./styles/BookOrderMng.scss";
+import { toast } from "react-toastify";
 
+import {uploadToCloudinary} from '../../../service/cloundinary/index'
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
 const { Step } = Steps;
@@ -155,47 +158,56 @@ function BookOrderMng() {
     setCancelModalOpen(true);
   }, []);
 
-  // Convert file to Base64
-  const toBase64 = useCallback(
-    (file) =>
-      new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = (error) => reject(error);
-      }),
-    []
-  );
+
+
 
   const handleDesignUpload = async () => {
-    if (!imageDesign.length) {
-      message.error("Vui lòng chọn ít nhất một hình ảnh thiết kế.");
+  if (!imageDesign.length) {
+    message.error("Vui lòng chọn ít nhất một hình ảnh thiết kế.");
+    return;
+  }
+
+  try {
+    setUploadLoading(true);
+
+    const validTypes = ["image/jpeg", "image/png", "image/webp"];
+    const invalidFiles = imageDesign.filter((file) => !validTypes.includes(file.type));
+    if (invalidFiles.length > 0) {
+      message.error("Chỉ hỗ trợ ảnh JPG, PNG, WEBP.");
+      setUploadLoading(false);
       return;
     }
 
-    try {
-      setUploadLoading(true);
+    const uploadedUrls = await Promise.all(
+  imageDesign.map(async (item) => {
+    const file = item.originFileObj;
+    const url = await uploadToCloudinary(file);
+    return url ? { image: url } : null;
+  })
+);
 
-      const payload = {
-        ...formData,
-        imageDesign: (formData.imageDesign || []).map((img) => ({
-          imageDesign: img.imageDesign,
-        })),
-      };
-      console.log(payload);
+const filtered = uploadedUrls.filter(Boolean);
+if (!filtered.length) {
+  message.error("Tải ảnh thất bại, vui lòng thử lại.");
+  return;
+}
 
-      await changeStatus(selectedOrder.id, payload);
-      message.success("Đã cập nhật thiết kế và chuyển đơn sang giao hàng.");
-      await fetchData();
-      setDetailModalOpen(false);
-      setDesignImages([]);
-    } catch (err) {
-      message.error("Cập nhật thiết kế thất bại.");
-      console.error("Upload error:", err);
-    } finally {
-      setUploadLoading(false);
-    }
-  };
+const payload = {
+  imageDesign: filtered,
+};
+await designUploadSuccess(selectedOrder.id, payload);
+    message.success("Đã cập nhật thiết kế và chuyển đơn sang giao hàng.");
+    await fetchData();
+    setDetailModalOpen(false);
+    setDesignImages([]);
+  } catch (err) {
+    console.error("Upload error:", err);
+    message.error("Cập nhật thiết kế thất bại.");
+  } finally {
+    setUploadLoading(false);
+  }
+};
+
 
   // Handle designer assignment
   const handleAssignDesigner = useCallback(async () => {
@@ -222,8 +234,10 @@ function BookOrderMng() {
       );
       await fetchData();
       setDetailModalOpen(false);
+      toast.success(`Đã giao task cho ${designName}`)
     } catch {
       message.error("Gán Designer thất bại. Vui lòng thử lại.");
+
     } finally {
       setLoading(false);
     }
@@ -231,30 +245,50 @@ function BookOrderMng() {
 
   // Handle delivery file upload
   const handleDelivery = useCallback(async () => {
-    if (!deliveryFile) {
-      message.error("Vui lòng chọn file giao hàng.");
+  if (!deliveryFile) {
+    message.error("Vui lòng chọn file giao hàng.");
+    return;
+  }
+
+  try {
+    setUploadLoading(true);
+
+    // Optional: Kiểm tra loại file
+    const validTypes = ["image/jpeg", "image/png", "application/pdf"];
+    if (!validTypes.includes(deliveryFile.type)) {
+      message.error("Chỉ hỗ trợ ảnh JPG, PNG hoặc file PDF.");
+      setUploadLoading(false);
       return;
     }
 
-    try {
-      setUploadLoading(true);
-
-      const formData = new FormData();
-      formData.append("imageDelivery", deliveryFile);
-
-      await deliverySuccess(selectedOrder.id, formData);
-
-      message.success("Đã cập nhật file giao hàng và hoàn tất đơn.");
-      await fetchData();
-      setDetailModalOpen(false);
-      setDeliveryFile(null);
-    } catch (err) {
-      console.error("Lỗi khi cập nhật file:", err);
-      message.error("Cập nhật file giao hàng thất bại. Vui lòng thử lại.");
-    } finally {
-      setUploadLoading(false);
+    // Upload lên Cloudinary
+    const deliveryUrl = await uploadToCloudinary(deliveryFile);
+    if (!deliveryUrl) {
+      throw new Error("Không lấy được đường dẫn từ Cloudinary.");
     }
-  }, [deliveryFile, selectedOrder, fetchData]);
+
+    const payload = {
+      imageDelivery: deliveryUrl,
+    };
+
+    // Gửi dữ liệu về backend
+    await deliverySuccess(selectedOrder.id, payload);
+
+    message.success("Đã cập nhật file giao hàng và hoàn tất đơn.");
+    await fetchData();
+    setDetailModalOpen(false);
+    toast.success(`Đã giao hoàn thành đơn ${selectedOrder.id}`)
+    setDeliveryFile(null);
+  } catch (err) {
+    console.error("Lỗi khi cập nhật file:", err);
+    message.error("Cập nhật file giao hàng thất bại. Vui lòng thử lại.");
+    toast.error("Cập nhật bị lỗi")
+  } finally {
+    setUploadLoading(false);
+  }
+}, [deliveryFile, selectedOrder?.id, fetchData]);
+
+
 
   // Handle order cancellation
   const handleCancelOrder = useCallback(async () => {

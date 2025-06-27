@@ -35,7 +35,6 @@ export default function Success() {
 
     try {
       const res = await paymentSuccess(orderCode);
-      console.log(res);
       if (res?.code === 200) {
         setPaymentDetails({
           orderCode,
