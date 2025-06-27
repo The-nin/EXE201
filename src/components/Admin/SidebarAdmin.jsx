@@ -12,6 +12,7 @@ import {
   GiftOutlined,
   SolutionOutlined,
   PrinterOutlined,
+  ShoppingCartOutlined,
 } from "@ant-design/icons";
 import { GiRolledCloth } from "react-icons/gi";
 
@@ -31,6 +32,7 @@ const Sidebar = ({ collapsed }) => {
     "/admin/fabric": ["ADMIN", "MANAGER"],
     "/admin/bookOrder": ["ADMIN", "MANAGER", "STAFF", "DESIGNER"],
     "/admin/type-print": ["ADMIN", "MANAGER"],
+    "/admin/order": ["ADMIN", "MANAGER", "STAFF", "DELIVERY"],
     // "/admin/order": ["ADMIN", "MANAGER", "STAFF", "DELIVERY"],
     // "/admin/blog": ["ADMIN", "MANAGER", "EXPERT"],
     // "/admin/quiz": ["ADMIN", "MANAGER", "EXPERT"],
@@ -58,11 +60,6 @@ const Sidebar = ({ collapsed }) => {
       label: "Quản lý sản phẩm",
     },
     {
-      key: "/admin/order",
-      icon: <AppstoreOutlined />,
-      label: "Quản lý đơn hàng",
-    },
-    {
       key: "/admin/category",
       icon: <AppstoreOutlined />,
       label: "Quản lý danh mục",
@@ -75,13 +72,18 @@ const Sidebar = ({ collapsed }) => {
     {
       key: "/admin/bookOrder",
       icon: <ReadOutlined />,
-      label: "Quản lý đơn hàng",
+      label: "Quản lý đặt hàng",
     },
     {
       key: "/admin/type-print",
       icon: <PrinterOutlined />,
       label: "Quản lý loại in",
-    }
+    },
+    {
+      key: "/admin/order",
+      icon: <ShoppingCartOutlined />,
+      label: "Quản lý đơn hàng",
+    },
   ];
   const filteredMenuItems = menuItems.filter((item) =>
     permissions[item.key]?.includes(userRole)
