@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
+  Upload,
   Table,
   Tag,
   Modal,
@@ -19,6 +20,8 @@ import {
   assignDesigner,
   cancelBookOrder,
   getAddressId,
+  changeStatus,
+  deliverySuccess,
 } from "../../../service/admin";
 import "./styles/BookOrderMng.scss";
 
@@ -30,10 +33,10 @@ const statusOrder = [
   "PENDING",
   "PAYMENT",
   "ASSIGNED_TASK",
-  "DELIVERY",
   "CUSTOMER_RECEIVED",
   "CUSTOMER_ACCEPTED",
   "CUSTOMER_REJECTED",
+  "DELIVERY",
   "FINISHED",
   "CANCELED",
 ];
@@ -54,10 +57,10 @@ const statusLabelMap = {
   PENDING: "Chờ xử lý",
   PAYMENT: "Đã thanh toán",
   ASSIGNED_TASK: "Đã gán Designer",
-  DELIVERY: "Đang giao",
   CUSTOMER_RECEIVED: "Khách đã nhận",
   CUSTOMER_ACCEPTED: "Khách chấp nhận",
   CUSTOMER_REJECTED: "Khách từ chối",
+  DELIVERY: "Đang giao",
   FINISHED: "Hoàn tất",
   CANCELED: "Đã hủy",
 };
@@ -65,7 +68,8 @@ const statusLabelMap = {
 function BookOrderMng() {
   const [orders, setOrders] = useState([]);
   const [designers, setDesigners] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [uploadLoading, setUploadLoading] = useState(false);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -73,8 +77,17 @@ function BookOrderMng() {
   const [cancelReason, setCancelReason] = useState("");
   const [addressDetails, setAddressDetails] = useState(null);
   const [addressLoading, setAddressLoading] = useState(false);
-
-  const fetchData = async () => {
+  const [deliveryFile, setDeliveryFile] = useState(null);
+  const [imageDesign, setDesignImages] = useState([]);
+  const [formData, setFormData] = useState({
+    designerId: 0,
+    designName: "",
+    imageDelivery: "",
+    imageDesign: [],
+    response: "",
+  });
+  // Fetch data (orders and designers)
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       const [ordersRes, designersRes] = await Promise.all([
@@ -82,7 +95,7 @@ function BookOrderMng() {
         getAllDesigner(),
       ]);
 
-      let ordersArr = Array.isArray(ordersRes) ? ordersRes : [];
+      const ordersArr = Array.isArray(ordersRes) ? ordersRes : [];
       ordersArr.sort(
         (a, b) =>
           statusOrder.indexOf(a.enumBookOrder) -
@@ -90,61 +103,102 @@ function BookOrderMng() {
       );
 
       setOrders(ordersArr);
-      console.log("Orders:", ordersArr);
       setDesigners(Array.isArray(designersRes) ? designersRes : []);
     } catch (err) {
-      console.error("Lỗi khi tải dữ liệu:", err);
       message.error("Không thể tải dữ liệu");
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const fetchAddressDetails = async (addressId) => {
+  // Fetch address details
+  const fetchAddressDetails = useCallback(async (addressId) => {
     try {
       setAddressLoading(true);
       const address = await getAddressId(addressId);
-      setAddressDetails(address);
-      console.log("Address details:", address);
-    } catch (error) {
-      console.error("Failed to fetch address details:", error);
+      setAddressDetails(address || null);
+    } catch {
       message.error("Không thể tải thông tin địa chỉ");
       setAddressDetails(null);
     } finally {
       setAddressLoading(false);
     }
-  };
-
-  useEffect(() => {
-    fetchData();
   }, []);
 
-  const openDetailModal = (order) => {
-    console.log("Opening detail modal for order:", order);
-    setSelectedOrder(order);
-    setSelectedDesignerId(order.designerId || "");
-    setDetailModalOpen(true);
+  // Initial data fetch
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
-    // Use consistent addressId key
-    const addrId = order.addressId || order.address_id;
-    if (addrId) {
-      fetchAddressDetails(addrId);
-    } else {
-      setAddressDetails(null);
-      setAddressLoading(false);
-      console.warn("No address id found in order:", order.id);
-      message.warning("Đơn hàng không có thông tin địa chỉ");
-    }
-  };
+  // Open detail modal
+  const openDetailModal = useCallback(
+    (order) => {
+      setSelectedOrder(order);
+      setSelectedDesignerId(order.designerId || "");
+      setDetailModalOpen(true);
+      const addrId = order.addressId || order.address_id;
+      if (addrId) {
+        fetchAddressDetails(addrId);
+      } else {
+        setAddressDetails(null);
+        setAddressLoading(false);
+        message.warning("Đơn hàng không có thông tin địa chỉ");
+      }
+    },
+    [fetchAddressDetails]
+  );
 
-  const openCancelModal = (order) => {
-    console.log("Opening cancel modal for order:", order);
+  // Open cancel modal
+  const openCancelModal = useCallback((order) => {
     setSelectedOrder(order);
     setCancelReason("");
     setCancelModalOpen(true);
+  }, []);
+
+  // Convert file to Base64
+  const toBase64 = useCallback(
+    (file) =>
+      new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = (error) => reject(error);
+      }),
+    []
+  );
+
+  const handleDesignUpload = async () => {
+    if (!imageDesign.length) {
+      message.error("Vui lòng chọn ít nhất một hình ảnh thiết kế.");
+      return;
+    }
+
+    try {
+      setUploadLoading(true);
+
+      const payload = {
+        ...formData,
+        imageDesign: (formData.imageDesign || []).map((img) => ({
+          imageDesign: img.imageDesign,
+        })),
+      };
+      console.log(payload);
+
+      await changeStatus(selectedOrder.id, payload);
+      message.success("Đã cập nhật thiết kế và chuyển đơn sang giao hàng.");
+      await fetchData();
+      setDetailModalOpen(false);
+      setDesignImages([]);
+    } catch (err) {
+      message.error("Cập nhật thiết kế thất bại.");
+      console.error("Upload error:", err);
+    } finally {
+      setUploadLoading(false);
+    }
   };
 
-  const handleAssignDesigner = async () => {
+  // Handle designer assignment
+  const handleAssignDesigner = useCallback(async () => {
     if (!selectedDesignerId) {
       message.error("Vui lòng chọn Designer để gán.");
       return;
@@ -163,51 +217,67 @@ function BookOrderMng() {
         designerId: designerInfo.id,
         response: "",
       });
-
       message.success(
         `Đã gán Designer "${designerInfo.fullName}" cho đơn hàng #${selectedOrder.id}`
       );
-
       await fetchData();
       setDetailModalOpen(false);
-    } catch (error) {
-      console.error("Gán Designer thất bại:", error);
+    } catch {
       message.error("Gán Designer thất bại. Vui lòng thử lại.");
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedDesignerId, designers, selectedOrder, fetchData]);
 
-  const handleCancelOrder = async () => {
+  // Handle delivery file upload
+  const handleDelivery = useCallback(async () => {
+    if (!deliveryFile) {
+      message.error("Vui lòng chọn file giao hàng.");
+      return;
+    }
+
+    try {
+      setUploadLoading(true);
+
+      const formData = new FormData();
+      formData.append("imageDelivery", deliveryFile);
+
+      await deliverySuccess(selectedOrder.id, formData);
+
+      message.success("Đã cập nhật file giao hàng và hoàn tất đơn.");
+      await fetchData();
+      setDetailModalOpen(false);
+      setDeliveryFile(null);
+    } catch (err) {
+      console.error("Lỗi khi cập nhật file:", err);
+      message.error("Cập nhật file giao hàng thất bại. Vui lòng thử lại.");
+    } finally {
+      setUploadLoading(false);
+    }
+  }, [deliveryFile, selectedOrder, fetchData]);
+
+  // Handle order cancellation
+  const handleCancelOrder = useCallback(async () => {
     if (!cancelReason.trim()) {
       message.error("Vui lòng nhập lý do hủy đơn.");
       return;
     }
 
-    console.log("Sending cancel request with:", {
-      id: selectedOrder.id,
-      response: cancelReason,
-    });
-
     try {
       setLoading(true);
-      const response = await cancelBookOrder(selectedOrder.id, cancelReason);
-      console.log("Cancel order response:", response);
+      await cancelBookOrder(selectedOrder.id, cancelReason);
       message.success(`Đã hủy đơn hàng #${selectedOrder.id}`);
       await fetchData();
       setCancelModalOpen(false);
       setCancelReason("");
-    } catch (err) {
-      console.error("Hủy đơn hàng thất bại:", err.response?.data || err);
-      const errorMessage =
-        err.response?.data?.message ||
-        "Hủy đơn hàng thất bại. Vui lòng thử lại.";
-      message.error(errorMessage);
+    } catch {
+      message.error("Hủy đơn hàng thất bại. Vui lòng thử lại.");
     } finally {
       setLoading(false);
     }
-  };
+  }, [cancelReason, selectedOrder, fetchData]);
 
+  // Table columns
   const columns = [
     {
       title: "ID",
@@ -228,8 +298,8 @@ function BookOrderMng() {
       key: "address",
       render: (address) =>
         address
-          ? `${address?.street || "--"},${address?.ward || "--"} ,${
-              address?.city || "--"
+          ? `${address.street || "--"}, ${address.ward || "--"}, ${
+              address.city || "--"
             }`
           : "--",
       width: 200,
@@ -326,7 +396,7 @@ function BookOrderMng() {
         bordered
       />
 
-      {/* Modal chi tiết */}
+      {/* Detail Modal */}
       <Modal
         title={`Chi tiết đơn hàng #${selectedOrder?.id || ""}`}
         open={detailModalOpen}
@@ -334,6 +404,8 @@ function BookOrderMng() {
           setDetailModalOpen(false);
           setAddressDetails(null);
           setAddressLoading(false);
+          setDesignImages([]);
+          setDeliveryFile(null);
         }}
         footer={[
           <Button
@@ -342,6 +414,8 @@ function BookOrderMng() {
               setDetailModalOpen(false);
               setAddressDetails(null);
               setAddressLoading(false);
+              setDesignImages([]);
+              setDeliveryFile(null);
             }}
           >
             Đóng
@@ -353,6 +427,7 @@ function BookOrderMng() {
                 type="primary"
                 onClick={handleAssignDesigner}
                 disabled={!selectedDesignerId}
+                loading={loading}
               >
                 Gán Designer
               </Button>
@@ -372,17 +447,21 @@ function BookOrderMng() {
                 <Col span={10}>
                   <Text strong>Số điện thoại:</Text>
                 </Col>
-                <Col span={14}>{selectedOrder.user?.phone || "--"}</Col>
+                <Col span={14}>{selectedOrder?.user?.phone || "--"}</Col>
 
                 <Col span={10}>
                   <Text strong>Chi tiết địa chỉ:</Text>
                 </Col>
                 <Col span={14}>
-                  {selectedOrder
-                    ? `${selectedOrder.address?.street || ""}, ${
-                        selectedOrder.address?.ward || ""
-                      }, ${selectedOrder.address?.district || ""}`
-                    : "--"}
+                  {addressLoading ? (
+                    <Text>Loading...</Text>
+                  ) : addressDetails ? (
+                    `${addressDetails.street || "--"}, ${
+                      addressDetails.ward || "--"
+                    }, ${addressDetails.district || "--"}`
+                  ) : (
+                    "--"
+                  )}
                 </Col>
 
                 <Col span={10}>
@@ -456,7 +535,7 @@ function BookOrderMng() {
                 </Col>
 
                 <Col span={10}>
-                  <Text strong>Hình ảnh:</Text>
+                  <Text strong>Hình ảnh KH:</Text>
                 </Col>
                 <Col span={14}>
                   {Array.isArray(selectedOrder.imageSkins) &&
@@ -465,7 +544,11 @@ function BookOrderMng() {
                       {selectedOrder.imageSkins.map((img) => (
                         <img
                           key={img.id}
-                          src={img.image} // Nếu ảnh là base64 thì thêm prefix: `data:image/jpeg;base64,${img.image}`
+                          src={
+                            img.image.startsWith("data:image")
+                              ? img.image
+                              : `data:image/jpeg;base64,${img.image}`
+                          }
                           alt="Skin"
                           style={{
                             width: 80,
@@ -481,6 +564,64 @@ function BookOrderMng() {
                     <Text>Không có hình ảnh</Text>
                   )}
                 </Col>
+
+                <Col span={10}>
+                  <Text strong>Hình ảnh áo:</Text>
+                </Col>
+                <Col span={14}>
+                  {Array.isArray(selectedOrder.imageDesign) &&
+                  selectedOrder.imageDesign.length > 0 ? (
+                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                      {selectedOrder.imageDesign.map((img) => (
+                        <img
+                          key={img.id}
+                          src={
+                            img.image.startsWith("data:image")
+                              ? img.image
+                              : `data:image/jpeg;base64,${img.image}`
+                          }
+                          alt="Design"
+                          style={{
+                            width: 80,
+                            height: 80,
+                            objectFit: "cover",
+                            border: "1px solid #ccc",
+                            borderRadius: 4,
+                          }}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <Text>---</Text>
+                  )}
+                </Col>
+
+                {selectedOrder.enumBookOrder === "ASSIGNED_TASK" && (
+                  <>
+                    <Title level={5} style={{ marginTop: 24 }}>
+                      Cập nhật thiết kế hoàn chỉnh
+                    </Title>
+                    <Upload
+                      multiple
+                      listType="picture-card"
+                      beforeUpload={() => false}
+                      onChange={({ fileList }) => setDesignImages(fileList)}
+                      fileList={imageDesign}
+                      accept=".jpg,.png,.jpeg"
+                    >
+                      {imageDesign.length >= 8 ? null : "+ Upload"}
+                    </Upload>
+                    <Button
+                      type="primary"
+                      style={{ marginTop: 12 }}
+                      onClick={handleDesignUpload}
+                      loading={uploadLoading}
+                      disabled={!imageDesign.length}
+                    >
+                      Cập nhật thiết kế
+                    </Button>
+                  </>
+                )}
 
                 {selectedOrder.enumBookOrder === "CANCELED" && (
                   <>
@@ -545,6 +686,28 @@ function BookOrderMng() {
                     </Select>
                   </>
                 )}
+
+              {selectedOrder.enumBookOrder === "DELIVERY" && (
+                <>
+                  <Title level={5} style={{ marginTop: 24 }}>
+                    Cập nhật file giao hàng
+                  </Title>
+                  <Input
+                    type="file"
+                    accept=".zip,.rar,.pdf,.jpg,.png"
+                    onChange={(e) => setDeliveryFile(e.target.files[0])}
+                  />
+                  <Button
+                    type="primary"
+                    style={{ marginTop: 12 }}
+                    onClick={handleDelivery}
+                    loading={uploadLoading}
+                    disabled={!deliveryFile}
+                  >
+                    Cập nhật và hoàn tất đơn
+                  </Button>
+                </>
+              )}
             </Col>
           </Row>
         ) : (
@@ -552,7 +715,7 @@ function BookOrderMng() {
         )}
       </Modal>
 
-      {/* Modal hủy đơn */}
+      {/* Cancel Modal */}
       <Modal
         title={`Hủy đơn hàng #${selectedOrder?.id || ""}`}
         open={cancelModalOpen}

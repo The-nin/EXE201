@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { CheckCircle, AlertCircle } from "lucide-react";
 import { paymentSuccess } from "../../../service/user";
@@ -15,48 +15,45 @@ export default function Success() {
   const [loading, setLoading] = useState(true);
   const [paymentDetails, setPaymentDetails] = useState(null);
 
+  const handlePayment = useCallback(async () => {
+    const code = query.get("code");
+    const cancel = query.get("cancel");
+    const status = query.get("status");
+    const orderCode = query.get("orderCode");
+
+    if (!code || !cancel || !status || !orderCode) {
+      setError("Thiếu thông tin thanh toán. Vui lòng kiểm tra lại.");
+      setLoading(false);
+      return;
+    }
+
+    if (code !== "00" || status !== "PAID" || cancel === "true") {
+      setError("Thanh toán không thành công hoặc đã bị hủy.");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const res = await paymentSuccess(orderCode);
+      console.log(res);
+      if (res?.code === 200) {
+        setPaymentDetails({
+          orderCode,
+          status: "Đã thanh toán",
+          ...res.data,
+        });
+      } else {
+        setError("Dữ liệu đơn hàng không khớp. Vui lòng liên hệ hỗ trợ.");
+      }
+    } catch (err) {
+      console.log(err);
+      setError("Xảy ra lỗi khi xác nhận thanh toán.");
+    } finally {
+      setLoading(false);
+    }
+  }, [query]);
+
   useEffect(() => {
-    const handlePayment = async () => {
-      const code = query.get("code");
-      const cancel = query.get("cancel");
-      const status = query.get("status");
-      const orderCode = query.get("orderCode");
-
-      if (!code || !cancel || !status || !orderCode) {
-        setError("Thiếu thông tin thanh toán. Vui lòng kiểm tra lại.");
-        setLoading(false);
-        return;
-      }
-
-      if (code !== "00" || status !== "PAID" || cancel === "true") {
-        setError("Thanh toán không thành công hoặc đã bị hủy.");
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const res = await paymentSuccess(orderCode); // Gọi API xác nhận
-
-        // ✅ Kiểm tra orderCode trả về có khớp không
-        if (
-          (res?.code === 200 || res?.status === 200) &&
-          res?.data?.orderCode === orderCode
-        ) {
-          setPaymentDetails({
-            orderCode,
-            status: "Đã thanh toán",
-            ...res.data,
-          });
-        } else {
-          setError("Dữ liệu đơn hàng không khớp. Vui lòng liên hệ hỗ trợ.");
-        }
-      } catch (err) {
-        setError("Xảy ra lỗi khi xác nhận thanh toán.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     handlePayment();
   }, []);
 
@@ -78,7 +75,7 @@ export default function Success() {
     );
   }
 
-  if (error || !paymentDetails) {
+  if (error) {
     return (
       <div className="min-vh-100 d-flex align-items-center justify-content-center bg-light px-3">
         <div className="card shadow-sm w-100" style={{ maxWidth: 500 }}>

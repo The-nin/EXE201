@@ -103,10 +103,10 @@ export default function Header() {
           <Link
             to="/contact"
             className={`${header["nav-title"]} ${
-              isActive("/contact") ? header["active"] : ""
+              isActive("/custom-shirt") ? header["active"] : ""
             }`}
           >
-            Liên hệ
+            Đặt hàng
           </Link>
         </div>
 

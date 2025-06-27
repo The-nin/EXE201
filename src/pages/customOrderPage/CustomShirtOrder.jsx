@@ -121,7 +121,7 @@ function CustomShirtForm() {
     setShowPaymentModal(false);
 
     try {
-      const paymentRes = await paymentBookOrder(10, 2000);
+      const paymentRes = await paymentBookOrder(13, 2000);
 
       if (paymentRes?.code === 200 || paymentRes?.status === 200) {
         alert("Thanh toán thành công!");

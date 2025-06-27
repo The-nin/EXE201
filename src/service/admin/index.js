@@ -1,5 +1,5 @@
 import { instance } from "../instance";
-
+import axios from "axios";
 const token = localStorage.getItem("token");
 const authHeader = {
     headers: {
@@ -127,7 +127,28 @@ export const assignDesigner = async (bookOrderId, data) => {
   }
 };
 
-export const   getAddressByUser = async () => {
+export const deliverySuccess = async (id, formData) => {
+  try {
+    const response = await axios.patch(
+      `http://localhost:8080/api/bookOrder/delivery/${id}`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("API error:", error);
+    throw error;
+  }
+};
+
+
+
+export const getAddressByUser = async () => {
     try{
         const response = await instance.get("/api/addresses", authHeader);
         return response.data;
@@ -167,6 +188,21 @@ export const paymentSuccess = async (id) => {
         console.log("error", error);
     }
 }
+
+export const changeStatus = async (id, formData) => {
+  try {
+    const response = await instance.put(
+      `/api/bookOrder/${id}`,
+      formData,
+      authHeader
+    );
+    return response.data;
+  } catch (error) {
+    console.error("error", error.response?.data || error.message);
+    throw error;
+  }
+};
+
 
 export { 
     getAllAccount, 
