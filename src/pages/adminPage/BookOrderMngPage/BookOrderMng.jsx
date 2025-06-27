@@ -22,12 +22,13 @@ import {
   getAddressId,
   changeStatus,
   deliverySuccess,
-  designUploadSuccess
+  designUploadSuccess,
+  getImageDesign,
 } from "../../../service/admin";
 import "./styles/BookOrderMng.scss";
 import { toast } from "react-toastify";
+import { uploadToCloudinary } from "../../../service/cloundinary/index";
 
-import {uploadToCloudinary} from '../../../service/cloundinary/index'
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
 const { Step } = Steps;
@@ -73,6 +74,7 @@ function BookOrderMng() {
   const [designers, setDesigners] = useState([]);
   const [loading, setLoading] = useState(false);
   const [uploadLoading, setUploadLoading] = useState(false);
+  const [imageDesignLoading, setImageDesignLoading] = useState(false);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -82,6 +84,7 @@ function BookOrderMng() {
   const [addressLoading, setAddressLoading] = useState(false);
   const [deliveryFile, setDeliveryFile] = useState(null);
   const [imageDesign, setDesignImages] = useState([]);
+  const [listImageDesign, setListImageDesign] = useState([]);
   const [formData, setFormData] = useState({
     designerId: 0,
     designName: "",
@@ -89,6 +92,7 @@ function BookOrderMng() {
     imageDesign: [],
     response: "",
   });
+
   // Fetch data (orders and designers)
   const fetchData = useCallback(async () => {
     try {
@@ -113,6 +117,32 @@ function BookOrderMng() {
       setLoading(false);
     }
   }, []);
+
+  // Fetch design images for the selected order
+  useEffect(() => {
+    const fetchImageDesign = async () => {
+      if (!selectedOrder?.id) return;
+      try {
+        setImageDesignLoading(true);
+        const data = await getImageDesign(selectedOrder.id);
+        setListImageDesign(Array.isArray(data) ? data : []);
+        setListImageDesign(data);
+
+      } catch (err) {
+        message.error("Không thể lấy danh sách thiết kế.");
+      } finally {
+        setImageDesignLoading(false);
+      }
+    };
+    fetchImageDesign();
+  }, [selectedOrder]);
+
+  // Debug listImageDesign updates
+  useEffect(() => {
+    if (listImageDesign.length > 0) {
+      console.log("Updated listImageDesign:", listImageDesign);
+    }
+  }, [listImageDesign]);
 
   // Fetch address details
   const fetchAddressDetails = useCallback(async (addressId) => {
@@ -158,56 +188,96 @@ function BookOrderMng() {
     setCancelModalOpen(true);
   }, []);
 
-
-
-
+  // Handle design upload
   const handleDesignUpload = async () => {
-  if (!imageDesign.length) {
-    message.error("Vui lòng chọn ít nhất một hình ảnh thiết kế.");
-    return;
-  }
-
-  try {
-    setUploadLoading(true);
-
-    const validTypes = ["image/jpeg", "image/png", "image/webp"];
-    const invalidFiles = imageDesign.filter((file) => !validTypes.includes(file.type));
-    if (invalidFiles.length > 0) {
-      message.error("Chỉ hỗ trợ ảnh JPG, PNG, WEBP.");
-      setUploadLoading(false);
+    if (!imageDesign.length) {
+      message.error("Vui lòng chọn ít nhất một hình ảnh thiết kế.");
       return;
     }
 
-    const uploadedUrls = await Promise.all(
-  imageDesign.map(async (item) => {
-    const file = item.originFileObj;
-    const url = await uploadToCloudinary(file);
-    return url ? { image: url } : null;
-  })
-);
+    try {
+      setUploadLoading(true);
 
-const filtered = uploadedUrls.filter(Boolean);
-if (!filtered.length) {
-  message.error("Tải ảnh thất bại, vui lòng thử lại.");
-  return;
-}
+      const validTypes = ["image/jpeg", "image/png", "image/webp"];
+      const invalidFiles = imageDesign.filter(
+        (file) => !validTypes.includes(file.type)
+      );
+      if (invalidFiles.length > 0) {
+        message.error("Chỉ hỗ trợ ảnh JPG, PNG, WEBP.");
+        setUploadLoading(false);
+        return;
+      }
 
-const payload = {
-  imageDesign: filtered,
-};
-await designUploadSuccess(selectedOrder.id, payload);
-    message.success("Đã cập nhật thiết kế và chuyển đơn sang giao hàng.");
-    await fetchData();
-    setDetailModalOpen(false);
-    setDesignImages([]);
-  } catch (err) {
-    console.error("Upload error:", err);
-    message.error("Cập nhật thiết kế thất bại.");
-  } finally {
-    setUploadLoading(false);
-  }
-};
+      const uploadedUrls = await Promise.all(
+        imageDesign.map(async (item) => {
+          const file = item.originFileObj;
+          const url = await uploadToCloudinary(file);
+          return url ? { image: url } : null;
+        })
+      );
 
+      const filtered = uploadedUrls.filter(Boolean);
+      if (!filtered.length) {
+        message.error("Tải ảnh thất bại, vui lòng thử lại.");
+        return;
+      }
+
+      const payload = {
+        imageDesign: filtered,
+      };
+      await designUploadSuccess(selectedOrder.id, payload);
+      message.success("Đã cập nhật thiết kế và chuyển đơn sang giao hàng.");
+      await fetchData();
+      setDetailModalOpen(false);
+      setDesignImages([]);
+    } catch (err) {
+      console.error("Upload error:", err);
+      message.error("Cập nhật thiết kế thất bại.");
+    } finally {
+      setUploadLoading(false);
+    }
+  };
+
+  // Handle delivery file upload
+  const handleDelivery = useCallback(async () => {
+    if (!deliveryFile) {
+      message.error("Vui lòng chọn file giao hàng.");
+      return;
+    }
+
+    try {
+      setUploadLoading(true);
+
+      const validTypes = ["image/jpeg", "image/png", "application/pdf"];
+      if (!validTypes.includes(deliveryFile.type)) {
+        message.error("Chỉ hỗ trợ ảnh JPG, PNG hoặc file PDF.");
+        setUploadLoading(false);
+        return;
+      }
+
+      const deliveryUrl = await uploadToCloudinary(deliveryFile);
+      if (!deliveryUrl) {
+        throw new Error("Không lấy được đường dẫn từ Cloudinary.");
+      }
+
+      const payload = {
+        imageDelivery: deliveryUrl,
+      };
+
+      await deliverySuccess(selectedOrder.id, payload);
+      message.success("Đã cập nhật file giao hàng và hoàn tất đơn.");
+      await fetchData();
+      setDetailModalOpen(false);
+      toast.success(`Đã giao hoàn thành đơn ${selectedOrder.id}`);
+      setDeliveryFile(null);
+    } catch (err) {
+      console.error("Lỗi khi cập nhật file:", err);
+      message.error("Cập nhật file giao hàng thất bại. Vui lòng thử lại.");
+      toast.error("Cập nhật bị lỗi");
+    } finally {
+      setUploadLoading(false);
+    }
+  }, [deliveryFile, selectedOrder?.id, fetchData]);
 
   // Handle designer assignment
   const handleAssignDesigner = useCallback(async () => {
@@ -234,61 +304,13 @@ await designUploadSuccess(selectedOrder.id, payload);
       );
       await fetchData();
       setDetailModalOpen(false);
-      toast.success(`Đã giao task cho ${designName}`)
+      toast.success(`Đã giao task cho ${designerInfo.fullName}`);
     } catch {
       message.error("Gán Designer thất bại. Vui lòng thử lại.");
-
     } finally {
       setLoading(false);
     }
   }, [selectedDesignerId, designers, selectedOrder, fetchData]);
-
-  // Handle delivery file upload
-  const handleDelivery = useCallback(async () => {
-  if (!deliveryFile) {
-    message.error("Vui lòng chọn file giao hàng.");
-    return;
-  }
-
-  try {
-    setUploadLoading(true);
-
-    // Optional: Kiểm tra loại file
-    const validTypes = ["image/jpeg", "image/png", "application/pdf"];
-    if (!validTypes.includes(deliveryFile.type)) {
-      message.error("Chỉ hỗ trợ ảnh JPG, PNG hoặc file PDF.");
-      setUploadLoading(false);
-      return;
-    }
-
-    // Upload lên Cloudinary
-    const deliveryUrl = await uploadToCloudinary(deliveryFile);
-    if (!deliveryUrl) {
-      throw new Error("Không lấy được đường dẫn từ Cloudinary.");
-    }
-
-    const payload = {
-      imageDelivery: deliveryUrl,
-    };
-
-    // Gửi dữ liệu về backend
-    await deliverySuccess(selectedOrder.id, payload);
-
-    message.success("Đã cập nhật file giao hàng và hoàn tất đơn.");
-    await fetchData();
-    setDetailModalOpen(false);
-    toast.success(`Đã giao hoàn thành đơn ${selectedOrder.id}`)
-    setDeliveryFile(null);
-  } catch (err) {
-    console.error("Lỗi khi cập nhật file:", err);
-    message.error("Cập nhật file giao hàng thất bại. Vui lòng thử lại.");
-    toast.error("Cập nhật bị lỗi")
-  } finally {
-    setUploadLoading(false);
-  }
-}, [deliveryFile, selectedOrder?.id, fetchData]);
-
-
 
   // Handle order cancellation
   const handleCancelOrder = useCallback(async () => {
@@ -440,6 +462,7 @@ await designUploadSuccess(selectedOrder.id, payload);
           setAddressLoading(false);
           setDesignImages([]);
           setDeliveryFile(null);
+          setListImageDesign([]);
         }}
         footer={[
           <Button
@@ -450,6 +473,7 @@ await designUploadSuccess(selectedOrder.id, payload);
               setAddressLoading(false);
               setDesignImages([]);
               setDeliveryFile(null);
+              setListImageDesign([]);
             }}
           >
             Đóng
@@ -459,6 +483,14 @@ await designUploadSuccess(selectedOrder.id, payload);
               <Button
                 key="assign"
                 type="primary"
+                onCancel={() => {
+                  setDetailModalOpen(false);
+                  setAddressDetails(null);
+                  setAddressLoading(false);
+                  setDesignImages([]);
+                  setDeliveryFile(null);
+                  setListImageDesign([]);
+                }}
                 onClick={handleAssignDesigner}
                 disabled={!selectedDesignerId}
                 loading={loading}
@@ -603,10 +635,12 @@ await designUploadSuccess(selectedOrder.id, payload);
                   <Text strong>Hình ảnh áo:</Text>
                 </Col>
                 <Col span={14}>
-                  {Array.isArray(selectedOrder.imageDesign) &&
-                  selectedOrder.imageDesign.length > 0 ? (
+                  {imageDesignLoading ? (
+                    <Text>Loading...</Text>
+                  ) : Array.isArray(listImageDesign) &&
+                    listImageDesign.length > 0 ? (
                     <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                      {selectedOrder.imageDesign.map((img) => (
+                      {listImageDesign.map((img) => (
                         <img
                           key={img.id}
                           src={
@@ -626,7 +660,7 @@ await designUploadSuccess(selectedOrder.id, payload);
                       ))}
                     </div>
                   ) : (
-                    <Text>---</Text>
+                    <Text>Không có hình ảnh</Text>
                   )}
                 </Col>
 

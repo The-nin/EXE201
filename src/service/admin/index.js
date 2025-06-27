@@ -169,6 +169,21 @@ export const designUploadSuccess = async (id, payload) => {
   }
 };
 
+export const getImageDesign = async (id) => {
+  try {
+    const response = await instance.get(`/api/bookOrder/image/${id}`,{}, {
+      headers: {
+        ...authHeader
+      }
+    });
+    console.log(response.data);
+    return response.result;
+  } catch (error) {
+    console.error("API error:", error);
+    throw error;
+  }
+};
+
 
 export const getAddressByUser = async () => {
     try{
