@@ -5,6 +5,8 @@ import ProductDetail from "../../pages/productPage/ProductDetail";
 import OrderHistory from "../../pages/orderHistoryPage/OrderHistory";
 import Success from "../../pages/adminPage/BookOrderMngPage/Success";
 import OrderComplete from "../../pages/cart/Order-complete";
+import BookOrderHistory from "../../pages/bookOrderHistory/BookOrderHistory";
+import BookOrderHistoryDetail from "../../pages/bookOrderHistory/BookOrderHistoryDetail";
 const LandingPage = lazy(() => import("../../pages/landingPage/index"));
 const AboutUsPage = lazy(() => import("../../pages/aboutUsPage/AboutUsPage"));
 const ProductPage = lazy(() => import("../../pages/productPage/product"));
@@ -56,6 +58,14 @@ const userRoutes = [
   {
     path: ROUTES.ORDER_COMPLETE,
     element: <OrderComplete />,
+  },
+  {
+    path: ROUTES.BOOKORDER_HISTORY,
+    element: <BookOrderHistory />,
+  },
+  {
+    path: ROUTES.BOOKORDER_DETAIL_PAGE,
+    element: <BookOrderHistoryDetail />,
   },
 ];
 

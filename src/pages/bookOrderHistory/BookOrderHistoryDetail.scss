@@ -1,0 +1,36 @@
+/* src/components/BookOrderHistory.css */
+.bg-gradient-light {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.bg-purple {
+  background-color: #6b46c1;
+}
+
+.text-purple {
+  color: #6b46c1;
+}
+
+.btn-hover {
+  transition: all 0.3s ease;
+}
+
+.btn-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.hover-scale {
+  transition: transform 0.3s ease;
+}
+
+.hover-scale:hover {
+  transform: scale(1.05);
+}
+
+.card {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+@import url("https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css");
