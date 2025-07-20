@@ -86,17 +86,17 @@ function CustomShirtForm() {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setIsApiLoading(true);
-  setError("");
+    e.preventDefault();
+    setIsApiLoading(true);
+    setError("");
 
-  try {
-    const payload = {
-      ...formData,
-      image: (formData.image || []).map((img) => ({ image: img.image })),
-    };
+    try {
+      const payload = {
+        ...formData,
+        image: (formData.image || []).map((img) => ({ image: img.image })),
+      };
 
-    const response = await bookOrder(payload);
+      const response = await bookOrder(payload);
 
       if (response.code === 201) {
         setNewOrderId(response.result.id);
@@ -126,23 +126,20 @@ function CustomShirtForm() {
       if (paymentRes?.code === 200 || paymentRes?.status === 200) {
         const checkoutUrl = paymentRes?.result?.checkoutUrl;
         if (checkoutUrl) {
-          window.location.href = checkoutUrl; 
+          window.location.href = checkoutUrl;
         } else {
           alert("Không tìm thấy link thanh toán.");
         }
       } else {
         alert("Thanh toán thất bại.");
       }
-    } else {
-      setError(response?.message || "Đặt hàng thất bại.");
+    } catch (err) {
+      console.error("Lỗi khi đặt hàng:", err);
+      setError(err.response?.message || "Lỗi không xác định");
+    } finally {
+      setIsApiLoading(false);
     }
-  } catch (err) {
-    console.error("Lỗi khi đặt hàng:", err);
-    setError(err.response?.message || "Lỗi không xác định");
-  } finally {
-    setIsApiLoading(false);
-  }
-};
+  };
 
   // const handlePaymentConfirm = async () => {
   //   if (!newOrderId) return;
