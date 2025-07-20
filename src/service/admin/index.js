@@ -1,4 +1,4 @@
-import { getAuthHeader, instance } from "../instance";
+import { instance } from "../instance";
 
 const token = localStorage.getItem("token");
 const authHeader = {
@@ -127,7 +127,65 @@ export const assignDesigner = async (bookOrderId, data) => {
   }
 };
 
-export const   getAddressByUser = async () => {
+export const deliverySuccess = async (id, payload) => {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await instance.patch(
+      `/api/bookOrder/delivery/${id}`,
+      payload,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("API error:", error);
+    throw error;
+  }
+};
+
+export const designUploadSuccess = async (id, payload) => {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await instance.patch(
+      `/api/bookOrder/designer/${id}`,
+      payload,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    console.log(response.data)
+    return response.data;
+    
+  } catch (error) {
+    console.error("API error:", error);
+    throw error;
+  }
+};
+
+export const getImageDesign = async (id) => {
+  try {
+    const response = await instance.get(`/api/bookOrder/image/${id}`,{}, {
+      headers: {
+        ...authHeader
+      }
+    });
+    console.log(response.data);
+    return response.result;
+  } catch (error) {
+    console.error("API error:", error);
+    throw error;
+  }
+};
+
+
+export const getAddressByUser = async () => {
     try{
         const response = await instance.get("/api/addresses", authHeader);
         return response.data;
@@ -167,7 +225,6 @@ export const paymentSuccess = async (id) => {
         console.log("error", error);
     }
 }
-
 export const getTotalUsers = async () => {
     try {
         const response = await instance.get("/api/dashboard/total-users", getAuthHeader());
