@@ -1,0 +1,20 @@
+[33m57c12bf[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mnam[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{0}: pull origin main: Fast-forward
+[33m066b2c6[m[33m ([m[1;31morigin/nam[m[33m)[m HEAD@{1}: commit (merge): fdđaádádsadsadsad
+[33m231f8a6[m HEAD@{2}: commit (merge): Merge branch 'main' of https://github.com/The-nin/EXE201 into nam
+[33m9525b00[m HEAD@{3}: commit (merge): Merge branch 'nam' of https://github.com/The-nin/EXE201 into nam
+[33m35a8ab7[m HEAD@{4}: commit: repush code
+[33m01c5b09[m HEAD@{5}: pull origin nam: Fast-forward
+[33m72dff51[m HEAD@{6}: commit: code
+[33m1a552f7[m HEAD@{7}: checkout: moving from nam to nam
+[33m1a552f7[m HEAD@{8}: pull origin main: Fast-forward
+[33mc126b51[m[33m ([m[1;32mmain[m[33m)[m HEAD@{9}: checkout: moving from main to nam
+[33mc126b51[m[33m ([m[1;32mmain[m[33m)[m HEAD@{10}: commit: update code
+[33mfa4e905[m HEAD@{11}: commit: update code
+[33m40a685f[m HEAD@{12}: commit: oke
+[33m45fdbef[m HEAD@{13}: pull origin main: Fast-forward
+[33m12cc6e3[m HEAD@{14}: commit: Fix
+[33m6a8cced[m HEAD@{15}: commit: push
+[33m662e20c[m HEAD@{16}: commit (merge): Merge branch 'main' of https://github.com/The-nin/EXE201
+[33m220a28d[m HEAD@{17}: commit: Flow BookOrder
+[33m24a18db[m HEAD@{18}: commit: Create BookOrder
+[33m698837a[m HEAD@{19}: clone: from https://github.com/The-nin/EXE201.git

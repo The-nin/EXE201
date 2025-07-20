@@ -1,4 +1,4 @@
-import { instance } from "../instance";
+import { getAuthHeader, instance } from "../instance";
 
 const token = localStorage.getItem("token");
 const authHeader = {
@@ -117,7 +117,7 @@ export const getAllDesigner = async () => {
 export const assignDesigner = async (bookOrderId, data) => {
   try {
     const response = await instance.put(
-      `/api/bookOrder/${bookOrderId}`,
+`/api/bookOrder/${bookOrderId}`,
       data, authHeader
     );
     return response.data ;
@@ -127,65 +127,7 @@ export const assignDesigner = async (bookOrderId, data) => {
   }
 };
 
-export const deliverySuccess = async (id, payload) => {
-  try {
-    const token = localStorage.getItem("token");
-    const response = await instance.patch(
-      `/api/bookOrder/delivery/${id}`,
-      payload,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.error("API error:", error);
-    throw error;
-  }
-};
-
-export const designUploadSuccess = async (id, payload) => {
-  try {
-    const token = localStorage.getItem("token");
-    const response = await instance.patch(
-      `/api/bookOrder/designer/${id}`,
-      payload,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    console.log(response.data)
-    return response.data;
-    
-  } catch (error) {
-    console.error("API error:", error);
-    throw error;
-  }
-};
-
-export const getImageDesign = async (id) => {
-  try {
-    const response = await instance.get(`/api/bookOrder/image/${id}`,{}, {
-      headers: {
-        ...authHeader
-      }
-    });
-    console.log(response.data);
-    return response.result;
-  } catch (error) {
-    console.error("API error:", error);
-    throw error;
-  }
-};
-
-
-export const getAddressByUser = async () => {
+export const   getAddressByUser = async () => {
     try{
         const response = await instance.get("/api/addresses", authHeader);
         return response.data;
@@ -284,6 +226,57 @@ export const getAllOrder = async () => {
         console.log("error", error);
     }
 }
+
+export const getTotalUsers = async () => {
+    try {
+        const response = await instance.get("/api/dashboard/total-users", getAuthHeader());
+        return response.data.result;
+    } catch (error) {
+        console.log("error", error);
+    }
+}
+
+export const getTotalOrders = async () => {
+    try {
+        const response = await instance.get("/api/dashboard/total-orders", getAuthHeader());
+        return response.data.result;
+    } catch (error) {
+        console.log("error", error);
+    }
+}
+
+export const getTotalRevenue = async () => {
+    try {
+        const response = await instance.get("/api/dashboard/total-revenue", getAuthHeader());
+        return response.data.result;
+    } catch (error) {
+        console.log("error", error);
+    }
+}
+
+// export const getAllUser = async (page = 1, size = 10) =>{
+//     try{
+//         const response = await instance.get("/api/users/all",{
+//             headers : getAuthHeader(),
+//             params: { page, size },
+//         });
+//         console.log(response)
+//         return response;
+//     } catch (error) {
+//         console.log("error", error);
+//     }
+// }
+
+export const getAllUser = async () =>{
+    try{
+        const response = await instance.get("/api/users", getAuthHeader())
+        console.log(response)
+        return response.data;
+    } catch (error) {
+        console.log("error", error);
+    }
+}
+
 
 export { 
     getAllAccount, 
