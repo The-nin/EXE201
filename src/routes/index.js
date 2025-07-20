@@ -12,6 +12,8 @@ const ROUTES = {
     PROFILE_PAGE: "profile",
     ORDER_COMPLETE: "order-complete",
     ORDER_HISTORY_PAGE: "order-history",
+    BOOKORDER_HISTORY: "history-bookorder",
+    BOOKORDER_DETAIL_PAGE: "history-bookorder/:id",
     SUCCESS_PAGE: "success",
     ADMIN: {
         LOGIN: "login",

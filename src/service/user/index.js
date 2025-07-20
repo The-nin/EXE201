@@ -142,5 +142,14 @@ const getOrderDetail = async (id) => {
     }
 }
 
+export const getBookOrderHistory = async () => {
+    try {
+        const response = await instance.get("/api/bookOrder/mybookorder", authHeader)
+        return response.data.result
+    } catch (error) {
+        console.log("error", error);
+    }
+}
+
 export { bookOrder, getProductDetail, addToCart, getCart, updateCart, deleteCart, createOrder,
     getOrderDetail, getOrderHistory }

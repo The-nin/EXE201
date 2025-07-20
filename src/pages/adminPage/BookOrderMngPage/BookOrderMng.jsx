@@ -127,7 +127,6 @@ function BookOrderMng() {
         const data = await getImageDesign(selectedOrder.id);
         setListImageDesign(Array.isArray(data) ? data : []);
         setListImageDesign(data);
-
       } catch (err) {
         message.error("Không thể lấy danh sách thiết kế.");
       } finally {
