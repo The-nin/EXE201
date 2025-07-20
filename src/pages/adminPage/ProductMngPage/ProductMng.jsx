@@ -15,7 +15,6 @@ function ProductMng() {
     const fetchProducts = async () => {
       try {
         const res = await getAllProduct();
-        console.log("Products:", res);
         setProducts(res);
       } catch (error) {
         console.error("Lỗi khi gọi API:", error);
@@ -117,36 +116,36 @@ function ProductMng() {
       dataIndex: "description",
       key: "description",
     },
-    {
-      title: "Trạng thái",
-      dataIndex: "status",
-      key: "status",
-      render: (status) => {
-        return (
-          <Tag color={status === "ACTIVE" ? "green" : "red"}>
-            {status ? "Hoạt động" : "Không hoạt động"}
-          </Tag>
-        );
-      },
-    },
-    {
-      title: "",
-      dataIndex: "action",
-      key: "action",
-      render: (_, record) => {
-        return (
-          <div className="product-actions">
-            <button
-              className="btn btn-primary"
-              onClick={() => navigate(`/admin/product/detail/${record.id}`)}
-            >
-              Chi tiết
-            </button>
-            <button className="btn btn-danger">Xóa</button>
-          </div>
-        );
-      },
-    },
+    // {
+    //   title: "Trạng thái",
+    //   dataIndex: "status",
+    //   key: "status",
+    //   render: (status) => {
+    //     return (
+    //       <Tag color={status === "active" ? "green" : "red"}>
+    //         {status ? "Hoạt động" : "Không hoạt động"}
+    //       </Tag>
+    //     );
+    //   },
+    // },
+    // {
+    //   title: "",
+    //   dataIndex: "action",
+    //   key: "action",
+    //   render: (_, record) => {
+    //     return (
+    //       <div className="product-actions">
+    //         <button
+    //           className="btn btn-primary"
+    //           onClick={() => navigate(`/admin/product/detail/${record.id}`)}
+    //         >
+    //           Chi tiết
+    //         </button>
+    //         <button className="btn btn-danger">Xóa</button>
+    //       </div>
+    //     );
+    //   },
+    // },
   ];
 
   if (!products) return <div>Loading...</div>;

@@ -4,6 +4,8 @@ import MainPage from "../../pages/adminPage/MainPage/MainPage";
 import { ProtectedAdminRoute } from "../protectedRoute/ProtectedAdminRoute";
 import BookOrderMng from "../../pages/adminPage/BookOrderMngPage/BookOrderMng";
 import Designer from "../../pages/adminPage/Designer/Designer";
+import AdminDashboard from "../../pages/adminPage/DashboardPage/Dashboard";
+import Dashboard from "../../pages/adminPage/DashboardPage/test";
 const LoginAdmin = lazy(() =>
   import("../../pages/adminPage/LoginAdmin/LoginAdmin")
 );
@@ -54,6 +56,11 @@ const adminRoute = [
       </ProtectedAdminRoute>
     ),
     children: [
+      {
+        path: "",
+        // element: <AdminDashboard />,
+        element: <Dashboard />,
+      },
       {
         path: ROUTES.ADMIN.ACCOUNT_MNG,
         element: <AccountManagement />,

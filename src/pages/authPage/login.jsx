@@ -149,7 +149,7 @@ function LoginPage() {
                 </Button>
 
                 <div className="text-center mt-4">
-                  <a href="/forgot-password">Quên mật khẩu</a> |{" "}
+                  {/* <a href="/forgot-password">Quên mật khẩu</a> |{" "} */}
                   <a href="/auth/register">Đăng kí</a>
                 </div>
               </Form>

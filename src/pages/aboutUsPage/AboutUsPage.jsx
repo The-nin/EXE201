@@ -30,13 +30,13 @@ export default function AboutUsPage() {
       </Row>
 
       <Row className="mb-5 align-items-center fade-in-up">
-        <Col md={6}>
+        {/* <Col md={6}>
           <img
             src="https://th.bing.com/th/id/OIF.5Q30erg4V9B60fXHhxz5Sg?w=313&h=180&c=7&r=0&o=5&dpr=1.4&pid=1.7"
             alt="Mission"
             className="img-fluid rounded shadow float-animation"
           />
-        </Col>
+        </Col> */}
         <Col md={6}>
           <h2>Sứ mệnh của chúng tôi</h2>
           <p>

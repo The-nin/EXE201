@@ -33,7 +33,11 @@ function Footer() {
         <div className={footer["section"]}>
           <h5 className={footer["title"]}>📱 Mạng xã hội</h5>
           <div className={footer["social-icons"]}>
-            <a href="https://facebook.com" target="_blank" rel="noreferrer">
+            <a
+              href="https://facebook.com/Icot25"
+              target="_blank"
+              rel="noreferrer"
+            >
               <FaFacebookF />
             </a>{" "}
             <a href="https://instagram.com" target="_blank" rel="noreferrer">
