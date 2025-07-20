@@ -37,6 +37,9 @@ const AddTypePrintPage = lazy(() =>
 const AdminProductDetail = lazy(() =>
   import("../../pages/adminPage/ProductMngPage/ProductDetailAdmin")
 );
+const OrderMng = lazy(() =>
+  import("../../pages/adminPage/OrderMngPage/OrderMng")
+);
 
 const adminRoute = [
   {
@@ -128,6 +131,10 @@ const adminRoute = [
             element: <Designer />,
           },
         ],
+      },
+      {
+        path: ROUTES.ADMIN.ORDER,
+        element: <OrderMng />,
       },
     ],
   },

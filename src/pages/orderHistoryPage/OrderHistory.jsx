@@ -38,7 +38,7 @@ import {
   PhoneOutlined,
   MailOutlined,
 } from "@ant-design/icons";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getOrderDetail, getOrderHistory } from "../../service/user";
 
 const { Title, Text } = Typography;
@@ -57,32 +57,30 @@ export default function OrderHistory() {
     location.state?.orderInfo || null
   );
   const [showDetailModal, setShowDetailModal] = useState(false);
+  const [detailLoading, setDetailLoading] = useState(false); // Thêm loading cho chi tiết
 
   const [orderHistory, setOrderHistory] = useState([]);
 
+  const navigate = useNavigate();
+
   const getOrderHistoryList = async () => {
+    setLoading(true);
     try {
       const response = await getOrderHistory();
-      console.log(response);
+      console.log("Order History Response:", response.data.result);
 
       const sortedLatestOrders = response.data.result.sort(
         (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime()
       );
 
       setOrderHistory(sortedLatestOrders);
+      setFilteredOrders(sortedLatestOrders); // Đồng bộ filteredOrders với orderHistory ban đầu
     } catch (error) {
       console.error("Error fetching order history:", error);
-    }
-  };
-
-  const handleGetDetail = async () => {
-    try {
-      const response = await getOrderDetail();
-      console.log(response);
-      return response;
-    } catch (error) {
-      console.error("Error fetching order history:", error);
+      message.error("Không thể tải danh sách đơn hàng");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -90,158 +88,12 @@ export default function OrderHistory() {
     getOrderHistoryList();
   }, []);
 
-  // Mock data - replace with real API call
-  const mockOrders = [
-    {
-      orderId: "ORD-2024-001234",
-      orderDate: "2024-01-20 14:30:25",
-      status: "delivered",
-      statusText: "Đã giao hàng",
-      paymentMethod: "COD",
-      totalAmount: 897000,
-      itemCount: 3,
-      shippingAddress: {
-        fullName: "Nguyen Van A",
-        phone: "0909123456",
-        address: "123 Nguyễn Huệ",
-        ward: "P.Bến Nghé",
-        district: "Q.1",
-        city: "TP.HCM",
-      },
-      items: [
-        {
-          productName: "Áo thun custom design",
-          quantity: 2,
-          price: 299000,
-          image: "/placeholder.svg?height=60&width=60",
-          color: "Trắng",
-          size: "M",
-        },
-        {
-          productName: "Áo hoodie premium",
-          quantity: 1,
-          price: 599000,
-          image: "/placeholder.svg?height=60&width=60",
-          color: "Đen",
-          size: "L",
-        },
-      ],
-    },
-    {
-      orderId: "ORD-2024-001235",
-      orderDate: "2024-01-18 10:15:30",
-      status: "shipping",
-      statusText: "Đang giao hàng",
-      paymentMethod: "VNPAY",
-      totalAmount: 1250000,
-      itemCount: 2,
-      shippingAddress: {
-        fullName: "Tran Thi B",
-        phone: "0918234567",
-        address: "456 Lê Lợi",
-        ward: "P.Bến Thành",
-        district: "Q.1",
-        city: "TP.HCM",
-      },
-      items: [
-        {
-          productName: "Áo polo custom",
-          quantity: 1,
-          price: 450000,
-          image: "/placeholder.svg?height=60&width=60",
-          color: "Xanh",
-          size: "L",
-        },
-        {
-          productName: "Áo khoác bomber",
-          quantity: 1,
-          price: 800000,
-          image: "/placeholder.svg?height=60&width=60",
-          color: "Đen",
-          size: "XL",
-        },
-      ],
-    },
-    {
-      orderId: "ORD-2024-001236",
-      orderDate: "2024-01-15 16:45:12",
-      status: "processing",
-      statusText: "Đang xử lý",
-      paymentMethod: "COD",
-      totalAmount: 599000,
-      itemCount: 1,
-      shippingAddress: {
-        fullName: "Le Van C",
-        phone: "0987345678",
-        address: "789 Trần Hưng Đạo",
-        ward: "P.Cầu Kho",
-        district: "Q.1",
-        city: "TP.HCM",
-      },
-      items: [
-        {
-          productName: "Áo sweater premium",
-          quantity: 1,
-          price: 599000,
-          image: "/placeholder.svg?height=60&width=60",
-          color: "Xám",
-          size: "M",
-        },
-      ],
-    },
-    {
-      orderId: "ORD-2024-001237",
-      orderDate: "2024-01-10 09:20:45",
-      status: "cancelled",
-      statusText: "Đã hủy",
-      paymentMethod: "VNPAY",
-      totalAmount: 750000,
-      itemCount: 2,
-      shippingAddress: {
-        fullName: "Pham Thi D",
-        phone: "0976456789",
-        address: "321 Pasteur",
-        ward: "P.Võ Thị Sáu",
-        district: "Q.3",
-        city: "TP.HCM",
-      },
-      items: [
-        {
-          productName: "Áo thun oversize",
-          quantity: 2,
-          price: 375000,
-          image: "/placeholder.svg?height=60&width=60",
-          color: "Trắng",
-          size: "L",
-        },
-      ],
-    },
-  ];
-
-  useEffect(() => {
-    fetchOrders();
-  }, []);
-
   useEffect(() => {
     filterOrders();
-  }, [orders, searchText, statusFilter, dateRange]);
-
-  const fetchOrders = async () => {
-    setLoading(true);
-    try {
-      setTimeout(() => {
-        setOrders(mockOrders);
-        setLoading(false);
-      }, 1000);
-    } catch (error) {
-      console.error("Error fetching orders:", error);
-      message.error("Không thể tải danh sách đơn hàng");
-      setLoading(false);
-    }
-  };
+  }, [orderHistory, searchText, statusFilter, dateRange]);
 
   const filterOrders = () => {
-    let filtered = [...orders];
+    let filtered = [...orderHistory];
 
     if (searchText) {
       filtered = filtered.filter(
@@ -275,6 +127,19 @@ export default function OrderHistory() {
     }).format(price);
   };
 
+  const translateStatus = (status) => {
+    const statusTranslations = {
+      PENDING: "Chờ xử lý",
+      PAYMENT: "Đã thanh toán",
+      CONFIRMED: "Đã tiếp nhận",
+      DELIVERED: "Đã giao",
+      FINISHED: "Hoàn thành",
+      CANCELLED: "Hủy",
+    };
+
+    return statusTranslations[status] || status;
+  };
+
   const getStatusColor = (status) => {
     const statusColors = {
       pending: "orange",
@@ -297,9 +162,20 @@ export default function OrderHistory() {
     return statusIcons[status] || <ClockCircleOutlined />;
   };
 
-  const handleViewDetail = (order) => {
-    setSelectedOrder(order);
-    setShowDetailModal(true);
+  const handleViewDetail = async (orderId) => {
+    setDetailLoading(true);
+    try {
+      const response = await getOrderDetail(orderId);
+      console.log("Order Detail Response:", response);
+      setSelectedOrder(response.data.result); // Cập nhật selectedOrder với dữ liệu chi tiết từ API
+    } catch (error) {
+      console.error("Error fetching order detail:", error);
+      message.error("Không thể tải chi tiết đơn hàng");
+      setSelectedOrder(orderHistory.find((order) => order.orderId === orderId)); // Fallback nếu API thất bại
+    } finally {
+      setDetailLoading(false);
+      setShowDetailModal(true); // Mở modal sau khi hoàn tất
+    }
   };
 
   const handleReorder = (order) => {
@@ -324,7 +200,14 @@ export default function OrderHistory() {
       okText: "Hủy đơn hàng",
       okType: "danger",
       onOk: () => {
-        setOrders((prevOrders) =>
+        setOrderHistory((prevOrders) =>
+          prevOrders.map((o) =>
+            o.orderId === order.orderId
+              ? { ...o, status: "cancelled", statusText: "Đã hủy" }
+              : o
+          )
+        );
+        setFilteredOrders((prevOrders) =>
           prevOrders.map((o) =>
             o.orderId === order.orderId
               ? { ...o, status: "cancelled", statusText: "Đã hủy" }
@@ -369,13 +252,13 @@ export default function OrderHistory() {
           <Col>
             <Space>
               <Text strong style={{ color: "#1890ff", fontSize: "16px" }}>
-                {order.orderId}
+                #{order.orderId}
               </Text>
               <Tag
                 color={getStatusColor(order.status)}
                 icon={getStatusIcon(order.status)}
               >
-                {order.statusText}
+                {translateStatus(order.status)}
               </Tag>
             </Space>
           </Col>
@@ -390,14 +273,14 @@ export default function OrderHistory() {
 
       <div style={{ marginBottom: "16px" }}>
         <Row gutter={[12, 12]}>
-          {order.items.slice(0, 3).map((item, index) => (
+          {order?.orderResponseItemList?.map((item, index) => (
             <Col key={index} xs={24} sm={12} md={8}>
               <div
                 style={{ display: "flex", alignItems: "center", gap: "12px" }}
               >
                 <Avatar
-                  src={item.image || "/placeholder.svg"}
-                  size={50}
+                  src={item.thumbnailProduct || "/placeholder.svg"}
+                  size={100}
                   shape="square"
                   style={{ borderRadius: "8px" }}
                 />
@@ -406,7 +289,7 @@ export default function OrderHistory() {
                     strong
                     style={{
                       display: "block",
-                      fontSize: "14px",
+                      fontSize: "20px",
                       whiteSpace: "nowrap",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
@@ -414,8 +297,8 @@ export default function OrderHistory() {
                   >
                     {item.productName}
                   </Text>
-                  <Text type="secondary" style={{ fontSize: "12px" }}>
-                    {item.color} | {item.size} | x{item.quantity}
+                  <Text type="secondary" style={{ fontSize: "16px" }}>
+                    Màu trắng | x{item.quantity}
                   </Text>
                   <Text strong style={{ color: "#ff4d4f", fontSize: "13px" }}>
                     {formatPrice(item.price)}
@@ -424,7 +307,7 @@ export default function OrderHistory() {
               </div>
             </Col>
           ))}
-          {order.items.length > 3 && (
+          {order.items?.length > 3 && (
             <Col xs={24} sm={12} md={8}>
               <div
                 style={{
@@ -438,7 +321,7 @@ export default function OrderHistory() {
                 }}
               >
                 <Text type="secondary">
-                  +{order.items.length - 3} sản phẩm khác
+                  +{order.items?.length - 3} sản phẩm khác
                 </Text>
               </div>
             </Col>
@@ -473,11 +356,12 @@ export default function OrderHistory() {
           <Button
             size="small"
             icon={<EyeOutlined />}
-            onClick={() => handleViewDetail(order)}
+            onClick={() => handleViewDetail(order.orderId)}
+            loading={detailLoading && selectedOrder?.orderId === order.orderId}
           >
             Chi tiết
           </Button>
-          {order.status !== "cancelled" && (
+          {/* {order.status !== "cancelled" && (
             <Button
               size="small"
               type="primary"
@@ -486,8 +370,8 @@ export default function OrderHistory() {
             >
               Đặt lại
             </Button>
-          )}
-          {(order.status === "pending" || order.status === "processing") && (
+          )} */}
+          {order.status === "PENDING" && (
             <Button
               size="small"
               danger
@@ -556,13 +440,13 @@ export default function OrderHistory() {
             <Space style={{ width: "100%", justifyContent: "space-between" }}>
               <Button
                 icon={<ReloadOutlined />}
-                onClick={fetchOrders}
+                onClick={getOrderHistoryList}
                 loading={loading}
                 size="large"
               >
                 Làm mới
               </Button>
-              <Text type="secondary">{filteredOrders.length} đơn hàng</Text>
+              <Text type="secondary">{orderHistory?.length} đơn hàng</Text>
             </Space>
           </Col>
         </Row>
@@ -575,7 +459,7 @@ export default function OrderHistory() {
             Đang tải danh sách đơn hàng...
           </div>
         </div>
-      ) : filteredOrders.length === 0 ? (
+      ) : orderHistory?.length === 0 ? (
         <Card
           style={{ textAlign: "center", padding: "50px", borderRadius: "12px" }}
         >
@@ -592,14 +476,19 @@ export default function OrderHistory() {
               </div>
             }
           >
-            <Button type="primary" icon={<ShoppingOutlined />} size="large">
+            <Button
+              type="primary"
+              icon={<ShoppingOutlined />}
+              size="large"
+              onClick={() => navigate("/product")}
+            >
               Mua sắm ngay
             </Button>
           </Empty>
         </Card>
       ) : (
         <div>
-          {filteredOrders.map((order) => (
+          {orderHistory?.map((order) => (
             <OrderCard key={order.orderId} order={order} />
           ))}
         </div>
@@ -630,7 +519,12 @@ export default function OrderHistory() {
         ]}
         width={1000}
       >
-        {selectedOrder && (
+        {detailLoading ? (
+          <div style={{ textAlign: "center", padding: "50px" }}>
+            <Spin size="large" />
+            <div style={{ marginTop: "16px" }}>Đang tải chi tiết...</div>
+          </div>
+        ) : selectedOrder ? (
           <div>
             <Row gutter={[24, 24]}>
               {/* Order Details */}
@@ -643,7 +537,7 @@ export default function OrderHistory() {
                   <Descriptions column={2} size="small">
                     <Descriptions.Item label="Mã đơn hàng" span={2}>
                       <Text strong style={{ color: "#1890ff" }}>
-                        {selectedOrder?.orderId}
+                        # {selectedOrder?.orderId}
                       </Text>
                     </Descriptions.Item>
                     <Descriptions.Item label="Ngày đặt hàng">
@@ -654,7 +548,7 @@ export default function OrderHistory() {
                     </Descriptions.Item>
                     <Descriptions.Item label="Trạng thái">
                       <Tag color={getStatusColor(selectedOrder.status)}>
-                        {selectedOrder.statusText}
+                        {translateStatus(selectedOrder.status)}
                       </Tag>
                     </Descriptions.Item>
                     <Descriptions.Item label="Phương thức thanh toán">
@@ -675,48 +569,53 @@ export default function OrderHistory() {
                 {/* Order Items */}
                 <Card title="Sản phẩm đã đặt">
                   <Space direction="vertical" style={{ width: "100%" }}>
-                    {selectedOrder?.items.map((item, index) => (
-                      <div key={index}>
-                        <Row align="middle" gutter={16}>
-                          <Col flex="60px">
-                            <img
-                              src={item.image || "/placeholder.svg"}
-                              alt={item.productName}
-                              style={{
-                                width: "60px",
-                                height: "60px",
-                                objectFit: "cover",
-                                borderRadius: "6px",
-                                border: "1px solid #f0f0f0",
-                              }}
-                            />
-                          </Col>
-                          <Col flex="auto">
-                            <div>
-                              <Text strong>{item.productName}</Text>
-                              <br />
-                              <Text
-                                type="secondary"
-                                style={{ fontSize: "12px" }}
-                              >
-                                Màu: {item.color} | Size: {item.size}
+                    {selectedOrder?.orderResponseItemList?.map(
+                      (item, index) => (
+                        <div key={index}>
+                          <Row align="middle" gutter={16}>
+                            <Col flex="60px">
+                              <img
+                                src={
+                                  item.thumbnailProduct || "/placeholder.svg"
+                                }
+                                alt={item.productName}
+                                style={{
+                                  width: "60px",
+                                  height: "60px",
+                                  objectFit: "cover",
+                                  borderRadius: "6px",
+                                  border: "1px solid #f0f0f0",
+                                }}
+                              />
+                            </Col>
+                            <Col flex="auto">
+                              <div>
+                                <Text strong>{item.productName}</Text>
+                                <br />
+                                <Text
+                                  type="secondary"
+                                  style={{ fontSize: "12px" }}
+                                >
+                                  Màu: Trắng | Size: {item.size}
+                                </Text>
+                              </div>
+                            </Col>
+                            <Col>
+                              <Text>x{item.quantity}</Text>
+                            </Col>
+                            <Col>
+                              <Text strong style={{ color: "#ff4d4f" }}>
+                                {formatPrice(item.price)}
                               </Text>
-                            </div>
-                          </Col>
-                          <Col>
-                            <Text>x{item.quantity}</Text>
-                          </Col>
-                          <Col>
-                            <Text strong style={{ color: "#ff4d4f" }}>
-                              {formatPrice(item.price)}
-                            </Text>
-                          </Col>
-                        </Row>
-                        {index < selectedOrder.items.length - 1 && (
-                          <Divider style={{ margin: "12px 0" }} />
-                        )}
-                      </div>
-                    ))}
+                            </Col>
+                          </Row>
+                          {index <
+                            selectedOrder.orderResponseItemList?.length - 1 && (
+                            <Divider style={{ margin: "12px 0" }} />
+                          )}
+                        </div>
+                      )
+                    )}
                   </Space>
                 </Card>
 
@@ -727,25 +626,24 @@ export default function OrderHistory() {
                       <HomeOutlined
                         style={{ marginRight: "8px", color: "#1890ff" }}
                       />
-                      <Text strong>
-                        {selectedOrder?.shippingAddress.fullName}
-                      </Text>
+                      <Text strong>{selectedOrder?.address?.name}</Text>
                     </div>
                     <div>
                       <PhoneOutlined
                         style={{ marginRight: "8px", color: "#1890ff" }}
                       />
-                      <Text>{selectedOrder?.shippingAddress.phone}</Text>
+                      <Text>{selectedOrder?.address?.phone}</Text>
                     </div>
                     <div>
                       <MailOutlined
                         style={{ marginRight: "8px", color: "#1890ff" }}
                       />
                       <Text>
-                        {selectedOrder?.shippingAddress.address},{" "}
-                        {selectedOrder?.shippingAddress.ward},{" "}
-                        {selectedOrder?.shippingAddress.district},{" "}
-                        {selectedOrder?.shippingAddress.city}
+                        {selectedOrder?.address?.addressLine},{" "}
+                        {selectedOrder?.address?.street},{" "}
+                        {selectedOrder?.address?.ward},{" "}
+                        {selectedOrder?.address?.district},{" "}
+                        {selectedOrder?.address?.city}
                       </Text>
                     </div>
                   </Space>
@@ -764,9 +662,7 @@ export default function OrderHistory() {
                       }}
                     >
                       <Text>Tạm tính:</Text>
-                      <Text>
-                        {formatPrice((selectedOrder?.totalAmount || 0) - 30000)}
-                      </Text>
+                      <Text>{formatPrice(selectedOrder?.totalAmount)}</Text>
                     </div>
                     <div
                       style={{
@@ -775,7 +671,7 @@ export default function OrderHistory() {
                       }}
                     >
                       <Text>Phí vận chuyển:</Text>
-                      <Text>{formatPrice(30000)}</Text>
+                      <Text>{formatPrice(0)}</Text>
                     </div>
                     <Divider style={{ margin: "8px 0" }} />
                     <div
@@ -902,6 +798,10 @@ export default function OrderHistory() {
                 </li>
               </ul>
             </Card>
+          </div>
+        ) : (
+          <div style={{ textAlign: "center", padding: "50px" }}>
+            <Empty description="Không tìm thấy chi tiết đơn hàng" />
           </div>
         )}
       </Modal>
