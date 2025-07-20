@@ -10,7 +10,9 @@ import BookOrderHistoryDetail from "../../pages/bookOrderHistory/BookOrderHistor
 const LandingPage = lazy(() => import("../../pages/landingPage/index"));
 const AboutUsPage = lazy(() => import("../../pages/aboutUsPage/AboutUsPage"));
 const ProductPage = lazy(() => import("../../pages/productPage/product"));
-const ContactPage = lazy(() => import("../../pages/contactPage/contact"));
+const ContactPage = lazy(() =>
+  import("../../pages/customOrderPage/CustomShirtOrder")
+);
 const ProfilePage = lazy(() => import("../../pages/profilePage/ProfilePage"));
 const CartPage = lazy(() => import("../../pages/cart/cart"));
 

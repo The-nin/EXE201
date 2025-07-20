@@ -121,17 +121,19 @@ function CustomShirtForm() {
     setShowPaymentModal(false);
 
     try {
-      const paymentRes = await paymentBookOrder(13, 2000);
+      {
+        const paymentRes = await paymentBookOrder(13, 2000);
 
-      if (paymentRes?.code === 200 || paymentRes?.status === 200) {
-        const checkoutUrl = paymentRes?.result?.checkoutUrl;
-        if (checkoutUrl) {
-          window.location.href = checkoutUrl;
+        if (paymentRes?.code === 200 || paymentRes?.status === 200) {
+          const checkoutUrl = paymentRes?.result?.checkoutUrl;
+          if (checkoutUrl) {
+            window.location.href = checkoutUrl;
+          } else {
+            alert("Không tìm thấy link thanh toán.");
+          }
         } else {
-          alert("Không tìm thấy link thanh toán.");
+          alert("Thanh toán thất bại.");
         }
-      } else {
-        alert("Thanh toán thất bại.");
       }
     } catch (err) {
       console.error("Lỗi khi đặt hàng:", err);
