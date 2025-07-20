@@ -86,17 +86,17 @@ function CustomShirtForm() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsApiLoading(true);
-    setError("");
+  e.preventDefault();
+  setIsApiLoading(true);
+  setError("");
 
-    try {
-      const payload = {
-        ...formData,
-        image: (formData.image || []).map((img) => ({ image: img.image })),
-      };
+  try {
+    const payload = {
+      ...formData,
+      image: (formData.image || []).map((img) => ({ image: img.image })),
+    };
 
-      const response = await bookOrder(payload);
+    const response = await bookOrder(payload);
 
       if (response.code === 201) {
         setNewOrderId(response.result.id);
@@ -121,29 +121,58 @@ function CustomShirtForm() {
     setShowPaymentModal(false);
 
     try {
-      const paymentRes = await paymentBookOrder(14, 50000);
+      const paymentRes = await paymentBookOrder(13, 2000);
 
       if (paymentRes?.code === 200 || paymentRes?.status === 200) {
-        alert("Thanh toán thành công!");
-
         const checkoutUrl = paymentRes?.result?.checkoutUrl;
-
         if (checkoutUrl) {
-          window.location.href = checkoutUrl;
+          window.location.href = checkoutUrl; 
         } else {
-          console.warn("Không có checkoutUrl trong phản hồi");
           alert("Không tìm thấy link thanh toán.");
         }
       } else {
         alert("Thanh toán thất bại.");
       }
-    } catch (err) {
-      console.error("Lỗi khi thanh toán:", err);
-      alert("Đã xảy ra lỗi khi thanh toán.");
+    } else {
+      setError(response?.message || "Đặt hàng thất bại.");
     }
+  } catch (err) {
+    console.error("Lỗi khi đặt hàng:", err);
+    setError(err.response?.message || "Lỗi không xác định");
+  } finally {
+    setIsApiLoading(false);
+  }
+};
 
-    setNewOrderId(null);
-  };
+  // const handlePaymentConfirm = async () => {
+  //   if (!newOrderId) return;
+
+  //   setShowPaymentModal(false);
+
+  //   try {
+  //     const paymentRes = await paymentBookOrder(13, 2000);
+
+  //     if (paymentRes?.code === 200 || paymentRes?.status === 200) {
+  //       alert("Thanh toán thành công!");
+
+  //       const checkoutUrl = paymentRes?.result?.checkoutUrl;
+
+  //       if (checkoutUrl) {
+  //         window.location.href = checkoutUrl;
+  //       } else {
+  //         console.warn("Không có checkoutUrl trong phản hồi");
+  //         alert("Không tìm thấy link thanh toán.");
+  //       }
+  //     } else {
+  //       alert("Thanh toán thất bại.");
+  //     }
+  //   } catch (err) {
+  //     console.error("Lỗi khi thanh toán:", err);
+  //     alert("Đã xảy ra lỗi khi thanh toán.");
+  //   }
+
+  //   setNewOrderId(null);
+  // };
 
   return (
     <div className="container mt-4 mb-5">
