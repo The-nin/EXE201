@@ -50,13 +50,13 @@ export default function Product() {
         <div style={{ textAlign: "center", marginTop: 50 }}>
           <Spin size="large" />
         </div>
-      ) : !Array.isArray(products) || products.length === 0 ? (
+      ) : !Array.isArray(currentProducts) || currentProducts?.length === 0 ? (
         <Empty description="Không có sản phẩm nào" />
       ) : (
         <>
           <Container>
             <Row gutter={[16, 24]}>
-              {currentProducts.map((product) => (
+              {currentProducts?.map((product) => (
                 <Col key={product.id} xs={24} sm={12} md={6} lg={6}>
                   <ProductCard
                     id={product.id}

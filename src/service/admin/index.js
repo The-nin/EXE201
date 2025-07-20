@@ -218,6 +218,16 @@ export const getAllUser = async () =>{
     }
 }
 
+export const getAllOrder = async () => {
+    try {
+        const response = await instance.get("/orders", getAuthHeader());
+        console.log(response.data)
+        return response.data;
+    } catch (error) {
+        console.log("error", error);
+    }
+}
+
 export { 
     getAllAccount, 
     getAllCategory, createCategory, 
