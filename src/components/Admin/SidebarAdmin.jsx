@@ -15,6 +15,7 @@ import {
   ShoppingCartOutlined,
 } from "@ant-design/icons";
 import { GiRolledCloth } from "react-icons/gi";
+import ROUTES from "../../routes";
 
 const { Sider } = Layout;
 
@@ -45,7 +46,7 @@ const Sidebar = ({ collapsed }) => {
 
   const menuItems = [
     {
-      key: "/admin",
+      key: `/${ROUTES.ADMIN.DASHBOARD}`,
       icon: <DashboardOutlined />,
       label: "Trang chủ",
     },

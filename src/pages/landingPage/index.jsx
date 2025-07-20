@@ -106,6 +106,57 @@ function LandingPage() {
           </Row>
         </Container>
       </section>
+
+      <section className="process py-5">
+        <Container>
+          <div className="text-center mb-5">
+            <h2 className="display-5 fw-bold mb-3">Quy Trình Đặt Hàng</h2>
+            <p className="lead text-muted">
+              Chỉ với 4 bước đơn giản, bạn đã có ngay sản phẩm ưng ý
+            </p>
+          </div>
+          <Row>
+            <Col md={3} className="text-center mb-4 fade-in-up">
+              <div className="process-step">
+                <div className="step-number">1</div>
+                <h5 className="mt-3">Chọn Sản Phẩm</h5>
+                <p>Duyệt qua danh mục và chọn sản phẩm yêu thích</p>
+              </div>
+            </Col>
+            <Col md={3} className="text-center mb-4 fade-in-up">
+              <div className="process-step">
+                <div className="step-number">2</div>
+                <h5 className="mt-3">Tùy Chỉnh</h5>
+                <p>Chọn size, màu sắc và thiết kế theo ý muốn</p>
+              </div>
+            </Col>
+            <Col md={3} className="text-center mb-4 fade-in-up">
+              <div className="process-step">
+                <div className="step-number">3</div>
+                <h5 className="mt-3">Thanh Toán</h5>
+                <p>Thanh toán an toàn qua nhiều phương thức</p>
+              </div>
+            </Col>
+            <Col md={3} className="text-center mb-4 fade-in-up">
+              <div className="process-step">
+                <div className="step-number">4</div>
+                <h5 className="mt-3">Nhận Hàng</h5>
+                <p>Nhận sản phẩm tại nhà trong 2-3 ngày</p>
+              </div>
+            </Col>
+          </Row>
+        </Container>
+      </section>
+
+      {/* <section className="process py-5 bg-light">
+        <Container>
+          <div className="text-center mb-5">
+            <h2 className="display-5 fw-bold mb-3">Sản phẩm nổi bật</h2>
+            <div>Xem thêm</div>
+          </div>
+          <ProductCarousel />
+        </Container>
+      </section> */}
     </div>
   );
 }

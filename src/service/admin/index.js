@@ -1,5 +1,5 @@
 import { instance } from "../instance";
-import axios from "axios";
+
 const token = localStorage.getItem("token");
 const authHeader = {
     headers: {
@@ -225,21 +225,6 @@ export const paymentSuccess = async (id) => {
         console.log("error", error);
     }
 }
-
-export const changeStatus = async (id, formData) => {
-  try {
-    const response = await instance.put(
-      `/api/bookOrder/${id}`,
-      formData,
-      authHeader
-    );
-    return response.data;
-  } catch (error) {
-    console.error("error", error.response?.data || error.message);
-    throw error;
-  }
-};
-
 
 export { 
     getAllAccount, 

@@ -17,7 +17,7 @@ const ROUTES = {
     SUCCESS_PAGE: "success",
     ADMIN: {
         LOGIN: "login",
-        DASHBOARD: "dashboard",
+        DASHBOARD: "admin",
         ACCOUNT_MNG: "account-management",
         //
         PRODUCT_MNG: "product",
