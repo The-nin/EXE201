@@ -80,11 +80,11 @@ const Sidebar = ({ collapsed }) => {
       icon: <PrinterOutlined />,
       label: "Quản lý loại in",
     },
-    {
-      key: "/admin/order",
-      icon: <ShoppingCartOutlined />,
-      label: "Quản lý đơn hàng",
-    },
+    // {
+    //   key: "/admin/order",
+    //   icon: <ShoppingCartOutlined />,
+    //   label: "Quản lý đơn hàng",
+    // },
   ];
   const filteredMenuItems = menuItems.filter((item) =>
     permissions[item.key]?.includes(userRole)
