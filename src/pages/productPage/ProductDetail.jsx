@@ -78,8 +78,7 @@ export default function ProductDetail() {
   const handleAddToCart = async () => {
     const token = localStorage.getItem("token");
     if (!token) {
-      // You might want to handle this case - redirect to login or show login modal
-      // toast.error("Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng");
+      toast.error("Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng");
       return;
     }
 

@@ -30,7 +30,7 @@ export default function Product() {
   // Tính toán sản phẩm cho trang hiện tại
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentProducts = products.slice(startIndex, endIndex);
+  const currentProducts = products?.slice(startIndex, endIndex);
 
   return (
     <div
@@ -57,12 +57,12 @@ export default function Product() {
           <Container>
             <Row gutter={[16, 24]}>
               {currentProducts?.map((product) => (
-                <Col key={product.id} xs={24} sm={12} md={6} lg={6}>
+                <Col key={product?.id} xs={24} sm={12} md={6} lg={6}>
                   <ProductCard
-                    id={product.id}
-                    image={product.imageThumbnail}
-                    title={product.productName}
-                    price={product.price}
+                    id={product?.id}
+                    image={product?.imageThumbnail}
+                    title={product?.productName}
+                    price={product?.price}
                   />
                 </Col>
               ))}
