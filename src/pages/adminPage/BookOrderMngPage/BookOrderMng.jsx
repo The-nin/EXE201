@@ -38,10 +38,6 @@ const statusOrder = [
   "PAYMENT",
   "ASSIGNED_TASK",
   "CUSTOMER_RECEIVED",
-  "CUSTOMER_ACCEPTED",
-  "CUSTOMER_REJECTED",
-  "DELIVERY",
-  "FINISHED",
   "CANCELED",
 ];
 
@@ -49,11 +45,7 @@ const colorMap = {
   PENDING: "orange",
   PAYMENT: "gold",
   ASSIGNED_TASK: "geekblue",
-  DELIVERY: "purple",
   CUSTOMER_RECEIVED: "cyan",
-  CUSTOMER_ACCEPTED: "green",
-  CUSTOMER_REJECTED: "red",
-  FINISHED: "blue",
   CANCELED: "red",
 };
 
@@ -61,11 +53,7 @@ const statusLabelMap = {
   PENDING: "Chờ xử lý",
   PAYMENT: "Đã thanh toán",
   ASSIGNED_TASK: "Đã gán Designer",
-  CUSTOMER_RECEIVED: "Khách đã nhận",
-  CUSTOMER_ACCEPTED: "Khách chấp nhận",
-  CUSTOMER_REJECTED: "Khách từ chối",
-  DELIVERY: "Đang giao",
-  FINISHED: "Hoàn tất",
+  CUSTOMER_RECEIVED: "Đã hoàn tất",
   CANCELED: "Đã hủy",
 };
 

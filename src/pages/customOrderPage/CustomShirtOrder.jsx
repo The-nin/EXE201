@@ -122,7 +122,7 @@ function CustomShirtForm() {
 
     try {
       {
-        const paymentRes = await paymentBookOrder(13, 2000);
+        const paymentRes = await paymentBookOrder(newOrderId, 250000);
 
         if (paymentRes?.code === 200 || paymentRes?.status === 200) {
           const checkoutUrl = paymentRes?.result?.checkoutUrl;
@@ -372,7 +372,6 @@ function CustomShirtForm() {
         </div>
       </div>
 
-      {/* Modal xác nhận thanh toán */}
       {showPaymentModal && (
         <div
           className="modal fade show"
