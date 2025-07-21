@@ -1,8 +1,12 @@
 import axios from "axios";
 
 export const instance = axios.create({
+    //local
     // baseURL: "http://localhost:8080",
-    baseURL: "https://icot.onrender.com",
+    //PRM
+    // baseURL: "https://icot.onrender.com",
+    //Production
+    baseURL: "https://icot.vercel.app",
     withCredentials : true,
     timeout : 5000,
     headers: {
