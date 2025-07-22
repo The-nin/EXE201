@@ -252,7 +252,7 @@ export default function ProductDetail() {
           </div>
 
           {/* Color */}
-          <div className="mb-4">
+          {/* <div className="mb-4">
             <h5 className="fw-semibold mb-2">Màu sắc:</h5>
             <div className="d-flex align-items-center gap-2">
               <div
@@ -266,7 +266,7 @@ export default function ProductDetail() {
               ></div>
               <span className="fw-medium">Màu trắng</span>
             </div>
-          </div>
+          </div> */}
 
           {/* Size Selection */}
           {product?.sizes?.length > 0 && (
