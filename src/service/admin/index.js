@@ -10,7 +10,7 @@ const authHeader = {
 //Account Mng
 const getAllAccount = async () => {
     try {
-        const response = await instance.get("/api/users/all", authHeader);
+        const response = await instance.get("/api/users/all", getAuthHeader());
         return response.result;
     } catch (error) {
         console.log("error", error);
@@ -20,7 +20,7 @@ const getAllAccount = async () => {
 //Category Mng
 const getAllCategory = async () =>{
     try{
-        const response = await instance.get("/api/category", authHeader);
+        const response = await instance.get("/api/category", getAuthHeader());
         console.log(response)
         return response.data.result;
     } catch (error) {
@@ -30,7 +30,7 @@ const getAllCategory = async () =>{
 
 const createCategory = async (data) => {
     try {
-        const response = await instance.post("/api/category", data, authHeader);
+        const response = await instance.post("/api/category", data, getAuthHeader());
         console.log(response)
         return response.data;
     } catch (error) {
@@ -41,7 +41,7 @@ const createCategory = async (data) => {
 //Fabric Mng
 const getAllFabric = async () => {
     try {
-        const response = await instance.get("/api/fabric/all", authHeader);
+        const response = await instance.get("/api/fabric/all", getAuthHeader());
         return response.data.result;
     } catch (error) {
         console.log("error", error);
@@ -50,7 +50,7 @@ const getAllFabric = async () => {
 
 const createFabric = async (data) => {
     try {
-        const response = await instance.post("/api/fabric", data, authHeader);
+        const response = await instance.post("/api/fabric", data, getAuthHeader());
         console.log(response)
         return response.data;
     } catch (error) {
@@ -61,7 +61,7 @@ const createFabric = async (data) => {
 //Type Print Mng
 const getAllTypePrint = async () => {
     try {
-        const response = await instance.get("/api/typePrint/all", authHeader);
+        const response = await instance.get("/api/typePrint/all", getAuthHeader());
         return response.data.result;
     } catch (error) {
         console.log("error", error);
@@ -70,7 +70,7 @@ const getAllTypePrint = async () => {
 
 const addTypePrint = async (data) => {
     try {
-        const response = await instance.post("/api/typePrint", data, authHeader);
+        const response = await instance.post("/api/typePrint", data, getAuthHeader());
         return response.data;
     } catch (error) {
         console.log("error", error);
@@ -90,7 +90,7 @@ const getAllProduct = async () => {
 
 const createProduct = async (data) => {
     try {
-        const response = await instance.post("/api/products", data, authHeader);
+        const response = await instance.post("/api/products", data, getAuthHeader());
         return response
     } catch (error) {
         console.log("Error:", error)
@@ -99,7 +99,7 @@ const createProduct = async (data) => {
 
 export const getAllBookOrders = async () => {
     try{
-        const response = await instance.get("/api/bookOrder", authHeader);
+        const response = await instance.get("/api/bookOrder", getAuthHeader());
         return response.data.result;
     }catch(error){
         console.log("error", error);
@@ -108,7 +108,7 @@ export const getAllBookOrders = async () => {
 
 export const getAllDesigner = async () => {
     try{
-        const response = await instance.get("/api/users/designers", authHeader);
+        const response = await instance.get("/api/users/designers", getAuthHeader());
         return response.data.result;
     }catch(error){
         console.log("error", error);
@@ -119,7 +119,7 @@ export const assignDesigner = async (bookOrderId, data) => {
   try {
     const response = await instance.put(
 `/api/bookOrder/${bookOrderId}`,
-      data, authHeader
+      data, getAuthHeader()
     );
     return response.data ;
   } catch (error) {
@@ -130,7 +130,7 @@ export const assignDesigner = async (bookOrderId, data) => {
 
 export const   getAddressByUser = async () => {
     try{
-        const response = await instance.get("/api/addresses", authHeader);
+        const response = await instance.get("/api/addresses", getAuthHeader());
         return response.data;
     }catch(error){
         console.log("error", error);
@@ -153,7 +153,7 @@ export const cancelBookOrder = async (id, response) => {
 
 export const getAddressId = async (id) => {
     try{
-        const response = await instance.get(`/api/addresses/${id}`, authHeader);
+        const response = await instance.get(`/api/addresses/${id}`, getAuthHeader());
         return response.data;
     }catch(error){
         console.log("error", error);
@@ -162,7 +162,7 @@ export const getAddressId = async (id) => {
 
 export const paymentSuccess = async (id) => {
     try{
-        const response = await instance.patch(`/api/bookOrder/${id}/`, null, authHeader);
+        const response = await instance.patch(`/api/bookOrder/${id}/`, null, getAuthHeader());
         return response.data;
     }catch(error){
         console.log("error", error);
