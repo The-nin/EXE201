@@ -40,8 +40,12 @@ function Footer() {
             >
               <FaFacebookF />
             </a>{" "}
-            <a href="https://instagram.com" target="_blank" rel="noreferrer">
-              <FaInstagram />
+            <a
+              href="https://www.tiktok.com/@icot510?_t=ZS-8yEJY7JF1kH&_r=1"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <FaTiktok />
             </a>
           </div>
         </div>
