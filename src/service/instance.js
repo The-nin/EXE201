@@ -2,9 +2,9 @@ import axios from "axios";
 
 export const instance = axios.create({
     //local
-    // baseURL: "http://localhost:8080",
+    baseURL: "http://localhost:8080",
     //server
-    baseURL: "https://icot.onrender.com",
+    // baseURL: "https://icot.onrender.com",
     withCredentials : true,
     timeout : 5000,
     headers: {
