@@ -1,16 +1,16 @@
 import axios from "axios";
 
-// let baseURL = "";
+let baseURL = "";
 
 
-// console.log("import.meta.env:", import.meta.env);
+console.log("import.meta.env:", import.meta.env);
 
-// if(import.meta.env.DEV === true){
-//     baseURL = "http://localhost:8080";
-// }
-// if(import.meta.env.PROD === true){
-//     baseURL = "https://icot.onrender.com";
-// }
+if(import.meta.env.DEV === true){
+    baseURL = "http://localhost:8080";
+}
+if(import.meta.env.PROD === true){
+    baseURL = "https://icot.onrender.com";
+}
 
 // console.log(baseURL);
 
@@ -23,6 +23,7 @@ import axios from "axios";
 // })
 export const instance = axios.create({
     baseURL: "https://icot.onrender.com",
+    withCredentials: true,
     timeout: 5000,
     headers: {
       "Content-Type": "application/json",
