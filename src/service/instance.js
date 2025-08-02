@@ -1,14 +1,24 @@
 import axios from "axios";
 
+let baseURL = "";
+
+console.log("import.meta.env:", import.meta.env);
+
+if(import.meta.env.DEV === true){
+    baseURL = "http://localhost:8080";
+}
+if(import.meta.env.PROD === true){
+    baseURL = "https://icot.onrender.com";
+}
+
+console.log(baseURL);
+
 export const instance = axios.create({
-    //local
-    baseURL: "http://localhost:8080",
-    //server
-    // baseURL: "https://icot.onrender.com",
+    baseURL,
     withCredentials : true,
     timeout : 5000,
     headers: {
-        "Content-Type" : "application/json",
+      "Content-Type" : "application/json",
     },
 })
 
