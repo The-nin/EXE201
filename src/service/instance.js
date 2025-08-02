@@ -1,26 +1,33 @@
 import axios from "axios";
 
-let baseURL = "";
+// let baseURL = "";
 
-console.log("import.meta.env:", import.meta.env);
 
-if(import.meta.env.DEV === true){
-    baseURL = "http://localhost:8080";
-}
-if(import.meta.env.PROD === true){
-    baseURL = "https://icot.onrender.com";
-}
+// console.log("import.meta.env:", import.meta.env);
 
-console.log(baseURL);
+// if(import.meta.env.DEV === true){
+//     baseURL = "http://localhost:8080";
+// }
+// if(import.meta.env.PROD === true){
+//     baseURL = "https://icot.onrender.com";
+// }
 
+// console.log(baseURL);
+
+// export const instance = axios.create({
+//     "https://icot.onrender.com",
+//     timeout : 5000,
+//     headers: {
+//       "Content-Type" : "application/json",
+//     },
+// })
 export const instance = axios.create({
-    baseURL,
-    timeout : 5000,
+    baseURL: "https://icot.onrender.com",
+    timeout: 5000,
     headers: {
-      "Content-Type" : "application/json",
+      "Content-Type": "application/json",
     },
-})
-
+});
 export const getAuthHeader = () => {
   const token = localStorage.getItem("token");
   return {
