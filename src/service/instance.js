@@ -15,7 +15,6 @@ console.log(baseURL);
 
 export const instance = axios.create({
     baseURL,
-    withCredentials : true,
     timeout : 5000,
     headers: {
       "Content-Type" : "application/json",
