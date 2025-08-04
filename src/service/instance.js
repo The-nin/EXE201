@@ -22,7 +22,7 @@ if(import.meta.env.PROD === true){
 //     },
 // })
 export const instance = axios.create({
-    baseURL: "https://icot.onrender.com",
+    baseURL: "https://icot-mluv.onrender.com",
     withCredentials: true,
     timeout: 5000,
     headers: {
