@@ -619,7 +619,7 @@ export default function Cart() {
                   >
                     <option value="">Chọn phương thức thanh toán</option>
                     <option value="COD">COD</option>
-                    <option value="VNPAY">VNPAY</option>
+                    {/* <option value="VNPAY">VNPAY</option> */}
                   </Form.Select>
                 </Form.Group>
               </Card.Body>
