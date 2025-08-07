@@ -2,8 +2,7 @@ import axios from "axios";
 
 let baseURL = "";
 
-
-console.log("import.meta.env:", import.meta.env);
+// console.log("import.meta.env:", import.meta.env);
 
 if(import.meta.env.DEV === true){
     baseURL = "http://localhost:8080";
@@ -22,13 +21,15 @@ if(import.meta.env.PROD === true){
 //     },
 // })
 export const instance = axios.create({
-    baseURL: "https://icot.onrender.com",
+    // baseURL: "https://icot.onrender.com",
+    baseURL,
     withCredentials: true,
     timeout: 5000,
     headers: {
       "Content-Type": "application/json",
     },
 });
+
 export const getAuthHeader = () => {
   const token = localStorage.getItem("token");
   return {
