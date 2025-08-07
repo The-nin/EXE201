@@ -8,7 +8,7 @@ if(import.meta.env.DEV === true){
     baseURL = "http://localhost:8080";
 }
 if(import.meta.env.PROD === true){
-    baseURL = "https://icot.onrender.com";
+    baseURL = "https://icot-mluv.onrender.com";
 }
 
 // console.log(baseURL);
